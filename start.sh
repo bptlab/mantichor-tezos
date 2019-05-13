@@ -29,6 +29,6 @@ fi
 ./nodes/"$version".sh update_script
 
 # Start tezos nodes
-./nodes/"$version".sh start
+./nodes/"$version".sh start --rpc-port 127.0.0.1:8732
 
 # Start blockchain adapter (maybe pass started version?)
