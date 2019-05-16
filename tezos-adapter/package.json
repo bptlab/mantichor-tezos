@@ -4,7 +4,7 @@
   "description": "Execute choreographies on the Tezos blockchain",
   "main": "dist/index.js",
   "scripts": {
-    "start": "ts-node-dev --respawn --transpileOnly ./src/index.ts",
+    "start": "npm run build && npm run serve",
     "build": "tsc",
     "serve": "node -r esm dist/index.js",
     "watch": "nodemon dist/index.js",
