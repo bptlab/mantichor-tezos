@@ -50,7 +50,7 @@
     "prefer-object-spread": true,
     "promise-function-async": true,
     "radix": true,
-    "semicolon": [true, "never", "ignore-interfaces"],
+    "semicolon": [true, "always"],
     "space-before-function-paren": [true, {"anonymous": "always", "named": "never", "asyncArrow": "always"}],
     "switch-default": true,
     "triple-equals": [true, "allow-null-check"],
@@ -64,6 +64,7 @@
       "member-variable-declaration",
       "object-destructuring"
     ],
+    "types": ["node", "es6"],
     "unnecessary-else": true,
     "use-isnan": true,
     "variable-name": [
