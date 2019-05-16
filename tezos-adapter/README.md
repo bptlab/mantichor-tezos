@@ -1,15 +1,6 @@
-# chor-playground
+# Tezos Adapter
 
-This repository provides the following setup:
-
-- Node.js express server
-- TypeScript integration
-- Linting using TSLint
-- Docker support
-- `bpmn-moddle` integration
-
-It can be used as a basic REST API server.
-The repository also contains some basic examples on how to load and use BPMN models from XML files.
+Tezos Blockchain Choreography Converter and Backend
 
 ## Repository Structure
 
@@ -26,13 +17,6 @@ The repository also contains some basic examples on how to load and use BPMN mod
 
 ## Routes
 
-There are two sample routes:
-
-- `/gateways`  
-  Returns all the gateways in the `sample.bpmn` sample.
-- `/neighbors/:id`  
-  Returns all the predecessors/successors of the element with the given ID from the `order.bpmn` example.
-
 ## Usage
 
 ### Running Locally
@@ -47,6 +31,7 @@ npm install
 
 #### Scripts
 
+- `npm start` - builds the project, i.e., compiles the TypeScript and starts the application in developer mode
 - `npm run build` - builds the project, i.e., compiles the TypeScript code to JavaScript
 - `npm run serve` - serves the previously built project
 - `npm run watch` - build the projects, serves it and automatically updates on local changes
@@ -55,6 +40,6 @@ npm install
 ### Using Docker
 
 ```
-docker build -t chor-playground .
-docker run --rm -p 3000:3000 --name chor-playground -it chor-playground
+docker build -t tezos-adapter .
+docker run --rm -p 3000:3000 --name tezos-adapter -it tezos-adapter
 ```

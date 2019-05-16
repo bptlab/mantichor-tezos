@@ -1,7 +1,7 @@
 {
-  "name": "chor-playground",
+  "name": "tezos-adapter",
   "version": "0.0.1",
-  "description": "A playground for choreography development with TypeScript, Node and Express",
+  "description": "Execute choreographies on the Tezos blockchain",
   "main": "dist/index.js",
   "scripts": {
     "start": "ts-node-dev --respawn --transpileOnly ./src/index.ts",
@@ -11,26 +11,26 @@
     "lint": "tslint -c tslint.json -p tsconfig.json"
   },
   "author": {
-    "name": "Jan Ladleif",
-    "url": "https://github.com/jan-ladleif"
+    "name": "bptlab",
+    "url": "https://github.com/bptlab"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jan-ladleif/chor-playground"
+    "url": "https://github.com/bptlab/mantichor-tezos"
   },
   "devDependencies": {
-    "nodemon": "^1.18.11",
+    "nodemon": "^1.19.0",
     "ts-node-dev": "^1.0.0-pre.39",
-    "tslint": "^5.15.0",
-    "typescript": "^3.4.3"
+    "tslint": "^5.16.0",
+    "typescript": "^3.4.5"
   },
   "dependencies": {
     "@types/bpmn-moddle": "^5.1.1",
     "@types/express": "^4.16.1",
-    "@types/node": "^7.0.10",
+    "@types/node": "^7.10.6",
     "bpmn-moddle": "^5.1.6",
-    "esm": "^3.2.22",
+    "esm": "^3.2.23",
     "express": "^4.16.4"
   }
 }
