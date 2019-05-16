@@ -1,19 +1,29 @@
-import BpmnModdle, { Definitions } from 'bpmn-moddle';
-const moddle = new BpmnModdle();
+import { Choreography, FlowElement, RootElement } from 'bpmn-moddle';
+import {is, parseModdle} from '../helper/helpers';
 
 export class ChoreographyPreprocessor {
 
   public static async processXml(xml: string): Promise<any>  {
-    const jsonChoreography = await new Promise((resolve: ({}: Definitions) => void, reject: ({}) => void): void => {
-      moddle.fromXML(xml, (error: object, definitions: Definitions) => {
-        if (error) {
-          reject(error);
-        }
-        resolve(definitions);
-      });
+    const definitions = await parseModdle(xml);
+
+    const choreographies: Choreography[] = [];
+
+    definitions.rootElements.forEach((element: RootElement): void => {
+      if (is('bpmn:Choreography')(element)) {
+        choreographies.push(element as Choreography);
+      }
     });
 
-    return jsonChoreography;
+    if (choreographies.length === 0) {
+      return;
+    }
+
+    choreographies.forEach((choreography: Choreography): void => {
+      choreography.flowElements.forEach((flowElement: FlowElement): void => {
+        console.info(flowElement);
+      });
+      console.info('END');
+    });
   }
 
 }
