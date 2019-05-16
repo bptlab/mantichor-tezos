@@ -1,24 +1,36 @@
 {
-  "name": "tezos-adapter",
+  "name": "chor-playground",
   "version": "0.0.1",
-  "description": "Tezos adapter for executing choreographies",
+  "description": "A playground for choreography development with TypeScript, Node and Express",
+  "main": "dist/index.js",
   "scripts": {
-    "tsc": "tsc",
     "start": "ts-node-dev --respawn --transpileOnly ./src/index.ts",
-    "prod": "ts-node ./src/index.ts",
-    "test": "npm run lint",
-    "lint": "tslint -c tslint.json 'src/**/*.ts'"
+    "build": "tsc",
+    "serve": "node -r esm dist/index.js",
+    "watch": "nodemon dist/index.js",
+    "lint": "tslint -c tslint.json -p tsconfig.json"
   },
-  "author": "",
+  "author": {
+    "name": "Jan Ladleif",
+    "url": "https://github.com/jan-ladleif"
+  },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jan-ladleif/chor-playground"
+  },
   "devDependencies": {
-    "@types/node": "^11.11.5",
-    "ts-node": "^8.0.3",
+    "nodemon": "^1.18.11",
     "ts-node-dev": "^1.0.0-pre.39",
-    "tslint": "^5.14.0",
-    "typescript": "^3.4.2"
+    "tslint": "^5.15.0",
+    "typescript": "^3.4.3"
   },
   "dependencies": {
-    "xml2js": "^0.4.19"
+    "@types/bpmn-moddle": "^5.1.1",
+    "@types/express": "^4.16.1",
+    "@types/node": "^7.0.10",
+    "bpmn-moddle": "^5.1.6",
+    "esm": "^3.2.22",
+    "express": "^4.16.4"
   }
 }
