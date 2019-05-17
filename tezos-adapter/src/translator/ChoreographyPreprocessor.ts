@@ -1,9 +1,10 @@
-import { Choreography, FlowElement, RootElement } from 'bpmn-moddle';
+import { Choreography, ChoreographyTask, FlowElement, Gateway, RootElement } from 'bpmn-moddle';
 import {is, parseModdle} from '../helper/helpers';
+import { StructuredChoreography } from './../models/StructuredChoreography';
 
 export class ChoreographyPreprocessor {
 
-  public static async processXml(xml: string): Promise<any>  {
+  public static async processXml(xml: string): Promise<StructuredChoreography[]>  {
     const definitions = await parseModdle(xml);
 
     const choreographies: Choreography[] = [];
@@ -18,12 +19,17 @@ export class ChoreographyPreprocessor {
       return;
     }
 
-    choreographies.forEach((choreography: Choreography): void => {
-      choreography.flowElements.forEach((flowElement: FlowElement): void => {
-        console.info(flowElement);
-      });
-      console.info('END');
+    const structuredChoreographies = choreographies.map((choreography: Choreography): StructuredChoreography => {
+      const gateways: Gateway[] = choreography.flowElements
+        .filter(is('bpmn:Gateway'))
+        .map((element: FlowElement) => element as Gateway);
+      const tasks: ChoreographyTask[] = choreography.flowElements
+        .filter(is('bpmn:ChoreographyTask'))
+        .map((element: FlowElement) => element as ChoreographyTask);
+      return new StructuredChoreography(tasks, gateways);
     });
+
+    return structuredChoreographies;
   }
 
 }
