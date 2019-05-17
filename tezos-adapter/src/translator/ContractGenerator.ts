@@ -8,7 +8,18 @@ export class ContractGenerator {
   }
 
   public generateLiquidityCode(): string[] {
-    return [''];
+    const liquiditySources: string[] = this.choreographies.map((choreography: StructuredChoreography) =>  {
+      const liquiditySource = '';
+
+      // generate storage
+
+      // generate body
+
+      // TODO Generate Liquidity Code
+
+      return liquiditySource;
+    });
+    return liquiditySources;
   }
 }
 
