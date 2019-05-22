@@ -2,6 +2,7 @@ FROM node:9.4
 
 # expose ports
 EXPOSE 3000
+EXPOSE 8732
 
 # install packages
 COPY package*.json /
