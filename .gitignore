@@ -3,3 +3,7 @@ nodes/
 
 # Ignore VS Code dir
 .vscode/
+
+# Ignore tezos granary
+.granary/
+granary.json
