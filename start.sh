@@ -19,17 +19,17 @@ if [ "$#" -eq 0 ] ; then usage ; exit 1; fi
 
 version=""
 if [  "$1" == "alpha" ]; then
-  version="alphanet"
+  version="alpha"
 elif  [ "$1" == "main" ]; then
-    version="mainnet"
+    version="main"
 elif [ "$1" == "sandbox" ]; then
-    version="sandbox"
+    version="alpha"
 else 
     echo "Unknown parameter: $1"
     exit 1
 fi
 
-if [ "$version" == "alpha" ] || [ "$version" == "main" ]; then
+if [ "$1" == "alpha" ] || [ "$1" == "main" ]; then
     echo "Starting and updating tezos"
     # Update tezos nodes
     ./nodes/"$version".sh update_script
@@ -50,12 +50,13 @@ if [ "$version" == "alpha" ] || [ "$version" == "main" ]; then
 
     # Todo: only get relevant part of key!
     # secretKey=$(./nodes/"$version".sh client show address my_account -S) #
-elif [ "$version" == "sandbox" ]; then
+elif [ "$1" == "sandbox" ]; then
     echo "Installing granary tezos node"
     secretKey="unencrypted:edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh"
     npm install --global @stove-labs/granary@pre-alpha
     granary --version
     granary init
+    sudo chmod +x -R .granary/
     granary node start
     granary client - import secret key "activator" "unencrypted:edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6"
     granary client - "--block genesis activate protocol ProtoALphaALphaALphaALphaALphaALphaALphaALphaDdp3zK with fitness 1 and key activator and parameters $PWD/protocol_parameters.json --timestamp $(TZ='AAA+1' date +%FT%TZ)" 
@@ -69,5 +70,5 @@ fi
 # Start blockchain adapter (maybe pass started version?)
 cd tezos-adapter || exit
 docker build -t tezos-adapter .
-docker run --rm -p 3000:3000 8732:8732 -e TEZOS_VERSION="$1" -e TEZOS_KEY="$secretKey" --name tezos-adapter -it tezos-adapter
+docker run --rm -p 3000:3000 8732:8732 -e TEZOS_VERSION="$version" -e TEZOS_KEY="$secretKey" --name tezos-adapter -it tezos-adapter
 cd .. || exit

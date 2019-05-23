@@ -13,21 +13,9 @@ usage() {
 
 if [ "$#" -eq 0 ] ; then usage ; exit 1; fi
 
-version=""
-if [  "$1" == "alpha" ]; then
-  version="alphanet"
-elif  [ "$1" == "main" ]; then
-    version="mainnet"
-elif  [ "$1" == "sandbox" ]; then
-    version="sandbox"
-else 
-    echo "Unknown parameter: $1"
-    exit 1
-fi
-
-if [ "$version" == "alpha" ] || [ "$version" == "main" ]; then
-    ./nodes/"$version".sh stop
-elif [ "$version" == "sandbox" ]; then
+if [ "$1" == "alpha" ] || [ "$1" == "main" ]; then
+    ./nodes/"$1"net.sh stop
+elif [ "$1" == "sandbox" ]; then
     granary node stop
     docker rm granary-tezos-node-sandbox
     docker network rm granary
