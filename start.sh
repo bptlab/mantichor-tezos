@@ -71,5 +71,5 @@ fi
 # Start blockchain adapter (maybe pass started version?)
 cd tezos-adapter || exit
 docker build -t tezos-adapter .
-docker run --rm -p 3000:3000 -p 8732:8732 -e TEZOS_VERSION="$version" -e TEZOS_KEY="$secretKey" --name tezos-adapter -it tezos-adapter
+docker run --rm -p 3000:3000 -e TEZOS_VERSION="$version" -e TEZOS_KEY="$secretKey" --name tezos-adapter -it tezos-adapter
 cd .. || exit
