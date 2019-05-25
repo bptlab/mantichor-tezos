@@ -1,3 +1,4 @@
+import { ParallelGateway, SequenceFlow } from 'bpmn-moddle';
 import fi from 'fi-compiler';
 import { is } from '../helper/helpers';
 import { ChoreographyElement } from './../models/ChoreographyElement';
@@ -24,14 +25,14 @@ export class ContractGenerator {
 
       // generate storage
       const taskStates = `${tasks.map((task: ChoreographyElement) =>
-          `storage bool task_${task.id}_active;\n`).join('')}`;
+          `storage bool ${task.id}_active;\n`).join('')}`;
 
       const andJoinGatewayStates = `${andJoinGateways
           .map((andJoinGateway: ChoreographyElement) =>
             andJoinGateway
               .getPreviousElements()
               .map((incomingEdge: ChoreographyElement) =>
-                `storage bool join_input_${incomingEdge.id}_active;\n`,
+                `storage bool ${incomingEdge.id}_active;\n`,
               ).join(''),
             ).join('')}`;
 
@@ -41,34 +42,57 @@ export class ContractGenerator {
 
       const taskEntries = tasks.map((task: ChoreographyElement): string => {
         let generateInitEntry = false;
-        const code = `entry task_${task.id} () {
-          assert (storage.task_${task.id}_active);
+        const code = `entry ${task.id} () {
+          assert (storage.${task.id}_active);
           ${task.getPreviousElements().map((element: ChoreographyElement) => {
-            if (is('bpmn:ChoreographyTask')(element.getElement())) {
-              return `storage.task_${element.id}_active = bool false;\n`;
-            } else if (is('bpmn:SequenceFlow')(element.getElement())) {
-              return `storage.join_input_${element.id}_active = bool false;\n`;
-            } else if (is('bpmn:StartEvent')(element.getElement())) {
+            if (is('bpmn:StartEvent')(element.getElement())) {
               generateInitEntry = true;
+              return '';
+            } else {
+              return `storage.${element.id}_active = bool false;\n`;
             }
-          })}
+          }).join('')}
           ${task.getNextElements().map((element: ChoreographyElement) => {
-            if (is('bpmn:ChoreographyTask')(element.getElement())) {
-              return `storage.task_${element.id}_active = bool true;\n`;
-            } else if (is('bpmn:SequenceFlow')(element.getElement())) {
-              return `storage.join_input_${element.id}_active = bool true;\n`;
-            } else if (is('bpmn:EndEvent')(element.getElement())) {
+            if (is('bpmn:EndEvent')(element.getElement())) {
               return `storage.finished = bool true;\n`;
+            } else {
+              return `storage.${element.id}_active = bool true;\n`;
             }
-          })}
+          }).join('')}
         }\n`;
         const initEntry = generateInitEntry
-          ? `entry init() {storage.task_${task.id}_active = bool true;}\n`
+          ? `entry init() {storage.${task.id}_active = bool true;}\n`
           : '';
         return initEntry + code;
       }).join('');
 
-      const joinEntries = '';
+      const joinEntries = andJoinGateways.map((join: ChoreographyElement): string => {
+        let generateInitEntry = false;
+        const code = `entry ${join.id} () {
+          ${(join.getElement() as ParallelGateway).incoming.map((incomingEdge: SequenceFlow) => {
+            return `assert(storage.${incomingEdge.id}_active);\n`;
+          }).join('')}
+          ${join.getPreviousElements().map((element: ChoreographyElement) => {
+            if (is('bpmn:StartEvent')(element.getElement())) {
+              generateInitEntry = true;
+              return '';
+            } else {
+              return `storage.${element.id}_active = bool false;\n`;
+            }
+          }).join('')}
+          ${join.getNextElements().map((element: ChoreographyElement) => {
+            if (is('bpmn:EndEvent')(element.getElement())) {
+              return `storage.finished = bool true;\n`;
+            } else {
+              return `storage.${element.id}_active = bool true;\n`;
+            }
+          }).join('')}
+        }\n`;
+        const initEntry = generateInitEntry
+          ? `entry init() {storage.${join.id}_active = bool true;}\n`
+          : '';
+        return initEntry + code;
+      }).join('');
 
       const entries = taskEntries + joinEntries;
 
