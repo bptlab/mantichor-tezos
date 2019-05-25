@@ -1,15 +1,22 @@
-FROM node:9.4
+# Build stage
+FROM node:11-slim as build
 
-# expose ports
+WORKDIR /adapter
+COPY package* /adapter/
+# install packages
+RUN npm install
+COPY . /adapter
+
+# Production Stage
+FROM node:11-slim
+
+COPY --from=build /adapter /
+
+# Expose ports
 EXPOSE 3000
 EXPOSE 8732
 
-# install packages
-COPY package*.json /
-RUN npm install
-
-# copy sources and build
-COPY . /
+# Copy sources and build
 RUN npm run build
 
 ENTRYPOINT ["npm"]
