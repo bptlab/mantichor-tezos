@@ -107,6 +107,8 @@ export class ChoreographyPreprocessor {
               previousElements,
               structuredChoreography,
             );
+        } else if (is('bpmn:StartEvent')(source)) {
+          previousElements.push(structuredChoreography.getElementByReference(source));
         }
       });
     } else if (is('bpmn:ParallelGateway')(flowNode)

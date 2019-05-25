@@ -48,7 +48,7 @@ export class ContractGenerator {
               return `storage.task_${element.id}_active = bool false;\n`;
             } else if (is('bpmn:SequenceFlow')(element.getElement())) {
               return `storage.join_input_${element.id}_active = bool false;\n`;
-            } else if (is('bpmn:StartEvent')(element)) {
+            } else if (is('bpmn:StartEvent')(element.getElement())) {
               generateInitEntry = true;
             }
           })}
@@ -57,9 +57,11 @@ export class ContractGenerator {
               return `storage.task_${element.id}_active = bool true;\n`;
             } else if (is('bpmn:SequenceFlow')(element.getElement())) {
               return `storage.join_input_${element.id}_active = bool true;\n`;
+            } else if (is('bpmn:EndEvent')(element.getElement())) {
+              return `storage.finished = bool true;\n`;
             }
           })}
-        }`;
+        }\n`;
         const initEntry = generateInitEntry
           ? `entry init() {storage.task_${task.id}_active = bool true;}\n`
           : '';
