@@ -17,6 +17,7 @@ if [ "$1" == "alpha" ] || [ "$1" == "main" ]; then
     ./nodes/"$1"net.sh stop
 elif [ "$1" == "sandbox" ]; then
     granary node stop
+    docker network rm granary
     docker rm --force granary-tezos-node-sandbox
 else
     echo "Unknown version: $1"
