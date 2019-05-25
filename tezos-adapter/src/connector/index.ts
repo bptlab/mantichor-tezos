@@ -1,7 +1,7 @@
 import Sotez from 'sotez';
 
 const chain = process.env.TEZOS_VERSION || 'alpha'; // todo: does this work?
-const secretKey = process.env.TEZOS_KEY || '568ada10f255cc19dae3d0d3fbeb9c049ebb0b0b';
+const secretKey = process.env.TEZOS_KEY || 'edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh';
 const sotez = new Sotez('http://127.0.0.1:8732', chain); // todo: pass address as env var/parameter
 
 // todo: make functions return information

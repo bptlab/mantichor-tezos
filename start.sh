@@ -60,7 +60,8 @@ elif [ "$1" == "sandbox" ]; then
     granary node start&
     granary client - import secret key "activator" "unencrypted:edsk31vznjHSSpGExDMHYASz45VZqXN4DPxvsa4hAyY8dHM28cZzp6" --force
     granary client - "--block genesis activate protocol ProtoALphaALphaALphaALphaALphaALphaALphaALphaDdp3zK with fitness 1 and key activator and parameters $PWD/protocol_parameters.json --timestamp $(TZ='AAA+1' date +%FT%TZ)" 
-    granary client - import secret key "bootstrap1" "unencrypted:edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh"
+    granary client - import secret key "bootstrap1" "unencrypted:edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh" --force
+    granary client - bake for "bootstrap1"
 else
     echo "Unknown version: $1"
     exit 1
@@ -70,5 +71,5 @@ fi
 # Start blockchain adapter (maybe pass started version?)
 cd tezos-adapter || exit
 docker build -t tezos-adapter .
-docker run --rm -p 3000:3000 8732:8732 -e TEZOS_VERSION="$version" -e TEZOS_KEY="$secretKey" --name tezos-adapter -it tezos-adapter
+docker run --rm -p 3000:3000 -p 8732:8732 -e TEZOS_VERSION="$version" -e TEZOS_KEY="$secretKey" --name tezos-adapter -it tezos-adapter
 cd .. || exit
