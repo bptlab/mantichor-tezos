@@ -28,4 +28,8 @@ export class ChoreographyElement {
   public getElement(): FlowElement {
     return this.element;
   }
+
+  public get id(): string {
+    return this.element.id;
+  }
 }

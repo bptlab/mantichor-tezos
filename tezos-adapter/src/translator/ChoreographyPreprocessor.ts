@@ -1,5 +1,6 @@
 import {
   Choreography,
+  Definitions,
   ExclusiveGateway,
   FlowElement,
   FlowNode,
@@ -14,8 +15,11 @@ import { StructuredChoreography } from './../models/StructuredChoreography';
 
 export class ChoreographyPreprocessor {
 
-  public static async processXml(xml: string): Promise<StructuredChoreography[]>  {
-    const definitions = await parseModdle(xml);
+  public static async parseXml(xml: string): Promise<Definitions> {
+    return parseModdle(xml);
+  }
+
+  public static processDefinitions(definitions: Definitions): StructuredChoreography[] {
 
     const choreographies: Choreography[] = [];
 
