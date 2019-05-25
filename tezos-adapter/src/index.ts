@@ -10,7 +10,7 @@ const order = fs.readFileSync(path.join(__dirname, '/../assets/order.bpmn'), 'ut
 const sample = fs.readFileSync(path.join(__dirname, '/../assets/sample.bpmn'), 'utf-8');
 const example = fs.readFileSync(path.join(__dirname, '/../assets/simple-diagram.bpmn'), 'utf-8');
 
-ChoreographyPreprocessor.processXml(example);
+ChoreographyPreprocessor.parseXml(example);
 
 
 // const app = express();
