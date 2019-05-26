@@ -28,7 +28,7 @@ export class StructuredChoreography {
       const flowElement = element.getElement();
       if (is('bpmn:ParallelGateway')(flowElement)) {
         const parallelGateway = flowElement as ParallelGateway;
-        return parallelGateway.gatewayDirection === 'Converging';
+        return parallelGateway.outgoing.length === 1;
       }
       return false;
     });

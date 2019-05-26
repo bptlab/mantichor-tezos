@@ -32,4 +32,16 @@ export class ChoreographyElement {
   public get id(): string {
     return this.element.id;
   }
+
+  public get name(): string {
+    return this.element.name;
+  }
+
+  public get incoming(): FlowElement[] {
+    return ((this.element) as FlowNode).incoming;
+  }
+
+  public get outgoing(): FlowElement[] {
+    return ((this.element) as FlowNode).outgoing;
+  }
 }

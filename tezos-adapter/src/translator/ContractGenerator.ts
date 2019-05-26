@@ -30,8 +30,8 @@ export class ContractGenerator {
       const andJoinGatewayStates = `${andJoinGateways
           .map((andJoinGateway: ChoreographyElement) =>
             andJoinGateway
-              .getPreviousElements()
-              .map((incomingEdge: ChoreographyElement) =>
+              .incoming
+              .map((incomingEdge: SequenceFlow) =>
                 `storage bool ${incomingEdge.id}_active;\n`,
               ).join(''),
             ).join('')}`;
@@ -72,12 +72,12 @@ export class ContractGenerator {
           ${(join.getElement() as ParallelGateway).incoming.map((incomingEdge: SequenceFlow) => {
             return `assert(storage.${incomingEdge.id}_active);\n`;
           }).join('')}
-          ${join.getPreviousElements().map((element: ChoreographyElement) => {
-            if (is('bpmn:StartEvent')(element.getElement())) {
+          ${(join.getElement() as ParallelGateway).incoming.map((incomingEdge: SequenceFlow) => {
+            if (is('bpmn:StartEvent')(join.getElement())) {
               generateInitEntry = true;
               return '';
             } else {
-              return `storage.${element.id}_active = bool false;\n`;
+              return `storage.${incomingEdge.id}_active = bool false;\n`;
             }
           }).join('')}
           ${join.getNextElements().map((element: ChoreographyElement) => {

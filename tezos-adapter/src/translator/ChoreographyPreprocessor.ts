@@ -71,10 +71,10 @@ export class ChoreographyPreprocessor {
           nextElements.push(structuredChoreography.getElementByReference(target));
         } else if (is('bpmn:Gateway')(target)) {
           const gateway = target as Gateway;
-          if (gateway.gatewayDirection === 'Diverging') {
+          if (gateway.outgoing.length > 1) {
             // Case: Split - Select all subsequent elements of the split
             ChoreographyPreprocessor.selectNextElements(target, nextElements, structuredChoreography);
-          } else if (gateway.gatewayDirection === 'Converging') {
+          } else if (gateway.outgoing.length === 1) {
             if (is('bpmn:ExclusiveGateway')(gateway)) {
               // Case: Exclusive Join - Select the subsequent element of an exclusive gateway
               ChoreographyPreprocessor.selectNextElements(target, nextElements, structuredChoreography);
