@@ -93,14 +93,14 @@ export class ChoreographyPreprocessor {
   private static selectPreviousElements(
     flowNode: FlowNode, previousElements: ChoreographyElement[], structuredChoreography: StructuredChoreography,
   ) {
-    previousElements.push(structuredChoreography.getElementByReference(flowNode));
     if (is('bpmn:ChoreographyTask')(flowNode)) {
       // Case: Choreography Task
+      previousElements.push(structuredChoreography.getElementByReference(flowNode));
       flowNode.incoming.forEach((incomingEdge: SequenceFlow) => {
         const source = incomingEdge.sourceRef;
 
         if (is('bpmn:ExclusiveGateway')(source)
-          && (source as ExclusiveGateway).gatewayDirection === 'Diverging') {
+          && (source as ExclusiveGateway).outgoing.length !== 1) {
             // Case: Exclusive Split - Select all subsequent elements of the gateway
             ChoreographyPreprocessor.selectNextElements(
               source,
@@ -112,7 +112,7 @@ export class ChoreographyPreprocessor {
         }
       });
     } else if (is('bpmn:ParallelGateway')(flowNode)
-      && (flowNode as ParallelGateway).gatewayDirection === 'Converging') {
+      && (flowNode as ParallelGateway).outgoing.length === 1) {
         // Case: Parallel Join - Select all incoming edges
         flowNode.incoming.forEach((incomingEdge: SequenceFlow) => {
           previousElements.push(structuredChoreography.getElementByReference(incomingEdge));
