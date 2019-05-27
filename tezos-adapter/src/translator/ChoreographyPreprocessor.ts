@@ -54,6 +54,8 @@ export class ChoreographyPreprocessor {
           // Calculate Previous Elements
           ChoreographyPreprocessor
             .selectPreviousElements(flowNode, element.getPreviousElements(), structuredChoreography);
+
+          element.eliminateDuplicates();
         });
       return structuredChoreography;
     });

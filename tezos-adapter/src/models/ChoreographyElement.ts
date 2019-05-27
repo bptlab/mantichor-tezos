@@ -9,12 +9,9 @@ export class ChoreographyElement {
     this.element = element;
   }
 
-  public appendNextElement(element: ChoreographyElement): void {
-    this.nextElements.push(element);
-  }
-
-  public appendPreviousElement(element: ChoreographyElement): void {
-    this.previousElements.push(element);
+  public eliminateDuplicates(): void {
+    this.nextElements = this.makeSet(this.nextElements);
+    this.previousElements = this.makeSet(this.previousElements);
   }
 
   public getNextElements(): ChoreographyElement[] {
@@ -43,5 +40,14 @@ export class ChoreographyElement {
 
   public get outgoing(): FlowElement[] {
     return ((this.element) as FlowNode).outgoing;
+  }
+
+  private makeSet(initialElements: ChoreographyElement[]): ChoreographyElement[] {
+    return initialElements.reduce((elements: ChoreographyElement[], currentElement: ChoreographyElement) => {
+      if (elements.find((element: ChoreographyElement) => element.id === currentElement.id) === undefined) {
+        elements.push(currentElement);
+      }
+      return elements;
+    }, []);
   }
 }
