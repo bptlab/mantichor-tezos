@@ -45,11 +45,13 @@ export class ContractGenerator {
     const entryPoint = 'entry init() {\n';
 
     const startEvent = elements
-        .find((element: ChoreographyElement) => is('bpmn:StartEvent')(element.getElement()));
+        .filter((element: ChoreographyElement) => is('bpmn:StartEvent')(element.getElement()));
 
     const activateInitialElements = startEvent
-      .getNextElements()
-      .map((element: ChoreographyElement) => `  storage.${element.id}_active = bool true;\n`)
+      .map((element: ChoreographyElement) => element
+        .getNextElements()
+        .map((nextElement: ChoreographyElement) => `  storage.${nextElement.id}_active = bool true;\n`)
+        .join(''))
       .join('');
 
     return entryPoint +
@@ -121,13 +123,11 @@ export class ContractGenerator {
   private static generateParallelJoin(join: ChoreographyElement): string {
     const controlFlowCheck = `  if (${join
       .getPreviousElements()
-      .filter((element: ChoreographyElement) => !is('bpmn:StartEvent')(element.getElement()))
       .map((element: ChoreographyElement) => `storage.${element.id}_active`)
       .join(' && ')}) {\n`;
 
     const deactivatePreviousElements = join
       .getPreviousElements()
-      .filter((element: ChoreographyElement) => !is('bpmn:StartEvent')(element.getElement()))
       .map((element: ChoreographyElement) => `    storage.${element.id}_active = bool false;\n`)
       .join('');
 
