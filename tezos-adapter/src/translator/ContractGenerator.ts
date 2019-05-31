@@ -81,75 +81,64 @@ export class ContractGenerator {
 
       const controlFlowCheck = `  assert (storage.${task.id}_active);\n`;
 
-      const deactivatePreviousElements = task
-        .getPreviousElements()
-        .filter((element: ChoreographyElement) => !is('bpmn:StartEvent')(element.getElement()))
-        .map((element: ChoreographyElement) => `  storage.${element.id}_active = bool false;\n`)
-        .join('');
-
-      const activateNextElements = task
-        .getNextElements()
-        .filter((element: ChoreographyElement) => !is('bpmn:EndEvent')(element.getElement()))
-        .map((element: ChoreographyElement) => `  storage.${element.id}_active = bool true;\n`)
-        .join('');
-
-      const finishedFlag = task
-        .getNextElements()
-        .find((element: ChoreographyElement) => is('bpmn:EndEvent')(element.getElement())) !== undefined
-          ? '  storage.finished = bool true;\n'
-          : '';
-
-      // try to execute subsequent parallel joins
-      const subsequentParallelJoins = task
-        .getNextElements()
-        .filter((element: ChoreographyElement) => is('bpmn:SequenceFlow')(element.getElement()))
-        .map((element: ChoreographyElement) => (element.getElement() as SequenceFlow).targetRef)
-        .filter((flowNode: FlowNode) =>
-          is('bpmn:ParallelGateway')(flowNode) && (flowNode as ParallelGateway).outgoing.length === 1)
-        .map((parallelJoin: FlowNode) =>
-          ContractGenerator
-            .generateParallelJoin(joins.find((join: ChoreographyElement) => join.id === parallelJoin.id)))
-        .join('');
+      const controlFlowActions = ContractGenerator.generateControlFlowActions(task, joins);
 
       return entryPoint +
         controlFlowCheck +
-        deactivatePreviousElements +
-        activateNextElements +
-        finishedFlag +
-        subsequentParallelJoins +
+        controlFlowActions +
         '}\n\n';
   }
 
-  private static generateParallelJoin(join: ChoreographyElement): string {
+  private static generateParallelJoin(join: ChoreographyElement, joins: ChoreographyElement[]): string {
     const controlFlowCheck = `  if (${join
       .getPreviousElements()
       .map((element: ChoreographyElement) => `storage.${element.id}_active`)
       .join(' && ')}) {\n`;
 
-    const deactivatePreviousElements = join
-      .getPreviousElements()
-      .map((element: ChoreographyElement) => `    storage.${element.id}_active = bool false;\n`)
-      .join('');
-
-    const activateNextElements = join
-      .getNextElements()
-      .filter((element: ChoreographyElement) => !is('bpmn:EndEvent')(element.getElement()))
-      .map((element: ChoreographyElement) => `    storage.${element.id}_active = bool true;\n`)
-      .join('');
-
-    const finishedFlag = join
-      .getNextElements()
-      .find((element: ChoreographyElement) => is('bpmn:EndEvent')(element.getElement())) !== undefined
-        ? '    storage.finished = bool true;\n'
-        : '';
+    const controlFlowActions = ContractGenerator.generateControlFlowActions(join, joins);
 
     return controlFlowCheck +
-      deactivatePreviousElements +
-      activateNextElements +
-      finishedFlag +
+      controlFlowActions +
       '  }\n';
   }
 
+  private static generateControlFlowActions(
+    choreographyElement: ChoreographyElement,
+    joins: ChoreographyElement[]): string {
+    const deactivatePreviousElements = choreographyElement
+    .getPreviousElements()
+    .map((element: ChoreographyElement) => `  storage.${element.id}_active = bool false;\n`)
+    .join('');
+
+    const activateNextElements = choreographyElement
+    .getNextElements()
+    .filter((element: ChoreographyElement) => !is('bpmn:EndEvent')(element.getElement()))
+    .map((element: ChoreographyElement) => `  storage.${element.id}_active = bool true;\n`)
+    .join('');
+
+    const finishedFlag = choreographyElement
+    .getNextElements()
+    .find((element: ChoreographyElement) => is('bpmn:EndEvent')(element.getElement())) !== undefined
+      ? '  storage.finished = bool true;\n'
+      : '';
+
+    // try to execute subsequent parallel joins
+    const subsequentParallelJoins = choreographyElement
+    .getNextElements()
+    .filter((element: ChoreographyElement) => is('bpmn:SequenceFlow')(element.getElement()))
+    .map((element: ChoreographyElement) => (element.getElement() as SequenceFlow).targetRef)
+    .filter((flowNode: FlowNode) =>
+      is('bpmn:ParallelGateway')(flowNode) && (flowNode as ParallelGateway).outgoing.length === 1)
+    .map((parallelJoin: FlowNode) =>
+      ContractGenerator
+        .generateParallelJoin(joins.find((join: ChoreographyElement) => join.id === parallelJoin.id), joins))
+    .join('');
+
+    return deactivatePreviousElements +
+      activateNextElements +
+      finishedFlag +
+      subsequentParallelJoins;
+  }
 }
 
 export default ContractGenerator;
