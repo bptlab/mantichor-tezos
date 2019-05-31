@@ -4,7 +4,15 @@ import { is } from '../helper/helpers';
 import { ChoreographyElement } from './../models/ChoreographyElement';
 import { Contract } from './../models/Contract';
 import { StructuredChoreography } from './../models/StructuredChoreography';
+import { ChoreographyPreprocessor } from './ChoreographyPreprocessor';
 export class ContractGenerator {
+
+  public static async generateContractsFromBPMN(xml: string): Promise<Contract[]> {
+    const structuredChoreographies = await ChoreographyPreprocessor.parseXml(xml);
+    const definitions = ChoreographyPreprocessor.processDefinitions(structuredChoreographies);
+    const code = ContractGenerator.generateContracts(definitions);
+    return code;
+  }
 
   public static generateContracts(choreographies: StructuredChoreography[]): Contract[] {
     const fiCode = ContractGenerator.generateFiCode(choreographies);
@@ -14,7 +22,7 @@ export class ContractGenerator {
   public static compileFiCode(code: string[]): Contract[] {
     return code.map((fiCode: string) => {
       const compiled = fi.compile(fiCode);
-      return new Contract(compiled.ml, compiled.abi);
+      return new Contract(compiled.ml, compiled.abi, fiCode);
     });
   }
 
