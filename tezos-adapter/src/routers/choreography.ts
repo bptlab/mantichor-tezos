@@ -1,11 +1,14 @@
 import { Router } from 'express';
-import { ChoreographyPreprocessor } from '../translator/ChoreographyPreprocessor';
+import { ContractGenerator } from '../translator/ContractGenerator';
+import { Contract } from './../models/Contract';
 
 const router = Router();
 
-router.post('/choreographies', (request, response) => {
+router.post('/choreographies', async (request, response) => {
   const { xml, id } = request.body;
-  ChoreographyPreprocessor.parseXml(xml);
+  const contracts: Contract[] = await ContractGenerator
+    .generateContractsFromBPMN(xml);
+
   const address = 'no address yet';
   // TODO: Deploy contract
   response.send({
