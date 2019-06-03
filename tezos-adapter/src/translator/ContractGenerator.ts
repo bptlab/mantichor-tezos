@@ -5,6 +5,12 @@ import { ChoreographyElement } from './../models/ChoreographyElement';
 import { Contract } from './../models/Contract';
 import { StructuredChoreography } from './../models/StructuredChoreography';
 import { ChoreographyPreprocessor } from './ChoreographyPreprocessor';
+
+interface FiCodeMetaData {
+  code: string;
+  initialState: string;
+}
+
 export class ContractGenerator {
 
   public static async generateContractsFromBPMN(xml: string): Promise<Contract[]> {
@@ -19,15 +25,15 @@ export class ContractGenerator {
     return ContractGenerator.compileFiCode(fiCode);
   }
 
-  public static compileFiCode(code: string[]): Contract[] {
-    return code.map((fiCode: string) => {
+  public static compileFiCode(code: FiCodeMetaData[]): Contract[] {
+    return code.map((fiCode: FiCodeMetaData) => {
       const compiled = fi.compile(fiCode);
-      return new Contract(compiled.ml, compiled.abi, fiCode);
+      return new Contract(compiled.ml, compiled.abi, fiCode.initialState, fiCode.code);
     });
   }
 
-  public static generateFiCode(choreographies: StructuredChoreography[]): string[] {
-    const fiSources: string[] = choreographies.map((choreography: StructuredChoreography) =>  {
+  public static generateFiCode(choreographies: StructuredChoreography[]): FiCodeMetaData[] {
+    const fiSources = choreographies.map((choreography: StructuredChoreography): FiCodeMetaData =>  {
       const elements = choreography.getElements();
       const tasks = choreography.getChoreographyTasks();
       const joins = choreography.getAndJoinGateways();
@@ -42,9 +48,13 @@ export class ContractGenerator {
         .map((task: ChoreographyElement): string => ContractGenerator.generateTaskEntry(task, joins))
         .join('');
 
-      return storage +
-        initEntry +
-        taskEntries;
+      // generate initial state
+      const initialState = ContractGenerator.generateInitialState(tasks, joins);
+
+      return {
+        code: storage + initEntry + taskEntries,
+        initialState,
+      };
     });
     return fiSources;
   }
@@ -65,6 +75,19 @@ export class ContractGenerator {
     return entryPoint +
       activateInitialElements +
       '}\n\n';
+  }
+
+  private static generateInitialState(tasks: ChoreographyElement[], joins: ChoreographyElement[]): string {
+    const states = tasks.length + joins.length;
+    let result = '';
+    for (let i = 0; i < states; i++) {
+      result += '(Pair false ';
+    }
+    result += 'false';
+    for (let i = 0; i < states; i++) {
+      result += ')';
+    }
+    return result;
   }
 
   private static generateStorage(tasks: ChoreographyElement[], joins: ChoreographyElement[]): string {
