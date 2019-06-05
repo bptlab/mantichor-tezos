@@ -17,34 +17,23 @@ usage() {
 
 if [ "$#" -eq 0 ] ; then usage ; exit 1; fi
 
-version=""
-if [  "$1" == "alpha" ]; then
-  version="alpha"
-elif  [ "$1" == "main" ]; then
-    version="main"
-elif [ "$1" == "sandbox" ]; then
-    version="alpha"
-else 
-    echo "Unknown parameter: $1"
-    exit 1
-fi
 
 if [ "$1" == "alpha" ] || [ "$1" == "main" ]; then
     echo "Starting and updating tezos"
     # Update tezos nodes
-    ./nodes/"$version".sh update_script
+    ./nodes/"$1"net.sh update_script
 
     # Start tezos nodes
-    ./nodes/"$version".sh start --rpc-port 127.0.0.1:8732 --cors-origin '*' --cors-header 'Origin, X-Requested-With, Content-Type, Accept, Range'
+    ./nodes/"$1"net.sh start --rpc-port 127.0.0.1:8732 --cors-origin '*' --cors-header 'Origin, X-Requested-With, Content-Type, Accept, Range'
 
     echo "Waiting until tezos has been synchronised"
     echo "This might take quite some time!"
 
-    ./nodes/"$version".sh client bootstrapped
+    ./nodes/"$1"net.sh client bootstrapped
 
     echo "Adding account to tezos node"
 
-    ./nodes/"$version".sh client activate account my_account with "container:nodes/faucet.json"
+    ./nodes/"$1"net.sh client activate account my_account with "container:nodes/faucet.json"
     # ./tezos-client list known addresses
     # ./tezos-client show address my_account [-S --show-secret]
 
@@ -52,7 +41,7 @@ if [ "$1" == "alpha" ] || [ "$1" == "main" ]; then
     # secretKey=$(./nodes/"$version".sh client show address my_account -S) #
 elif [ "$1" == "sandbox" ]; then
     echo "Installing granary tezos node"
-    secretKey="unencrypted:edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh"
+    secretKey="edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh"
     npm install --global @stove-labs/granary@pre-alpha
     granary --version
     granary init
@@ -71,5 +60,6 @@ fi
 # Start blockchain adapter (maybe pass started version?)
 cd tezos-adapter || exit
 docker build -t tezos-adapter .
-docker run --rm -p 3000:3000 -e TEZOS_VERSION="$version" -e TEZOS_KEY="$secretKey" --name tezos-adapter -it tezos-adapter
+docker run --rm -p 3000:3000 -e TEZOS_KEY="$secretKey" --name tezos-adapter -it tezos-adapter
+# docker network connect granary tezos-adapter
 cd .. || exit
