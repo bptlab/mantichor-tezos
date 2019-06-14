@@ -2,7 +2,7 @@ import Sotez, { crypto, forge, ledger, utility } from '../../node_modules/sotez/
 // import Sotez, { crypto, forge, ledger, utility } from 'sotez';
 
 const key = process.env.TEZOS_KEY || 'edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh';
-const sotez = new Sotez('http://127.0.0.1:8732', 'main', 'main'); // todo: pass address as env var/parameter
+const sotez = new Sotez('http://node:8732', 'main', 'main'); // todo: pass address as env var/parameter
 
 // todo: make functions return information
 export async function deployContract(code: string, balance: number = 0, init: string = '') {

@@ -6,7 +6,7 @@ import request from 'request';
 import * as connector from './connector';
 
 // test connection to tezos
-request('http://127.0.0.1:8732/protocols', (error, response, body) => {
+request('http://node:8732/protocols', (error, response, body) => {
   if (!error && response.statusCode === 200) {
     console.log(body);
   } else {

@@ -1,4 +1,4 @@
-version: "2"
+version: "3"
 
 volumes:
   node_data:
@@ -10,7 +10,7 @@ services:
     hostname: node
     user: "tezos"
     entrypoint: "/usr/local/bin/tezos-node"
-    command: run --sandbox --rpc-addr 127.0.0.1:8732 --cors-origin '*' --cors-header 'Origin, X-Requested-With, Content-Type, Accept, Range' --data-dir data
+    command: run --sandbox --rpc-addr node:8732 --cors-origin '*' --cors-header 'Origin, X-Requested-With, Content-Type, Accept, Range' --data-dir data
     ports:
       - "8732:8732"
     expose:
@@ -21,4 +21,9 @@ services:
     env_file:
       - tezos-node.env
     restart: on-failure
+
+  adapter:
+    build: "tezos-adapter"
+    ports:
+      - "3000:3000"
 
