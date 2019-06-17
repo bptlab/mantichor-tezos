@@ -6,11 +6,11 @@ volumes:
 
 services:
   node:
-    image: tezos/tezos:master
+    build: "tezos-node"
     hostname: node
     user: "tezos"
     entrypoint: "/usr/local/bin/tezos-node"
-    command: run --sandbox --rpc-addr node:8732 --cors-origin '*' --cors-header 'Origin, X-Requested-With, Content-Type, Accept, Range' --data-dir data
+    command: run --sandbox="./sandbox.json" --rpc-addr node:8732 --cors-origin '*' --cors-header 'Origin, X-Requested-With, Content-Type, Accept, Range' --data-dir data
     ports:
       - "8732:8732"
     expose:
