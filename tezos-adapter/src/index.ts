@@ -10,7 +10,7 @@ request('http://node:8732/protocols', (error, response, body) => {
   if (!error && response.statusCode === 200) {
     console.log(body);
   } else {
-    console.log(error, response);
+    console.log('Error when contacting tezos node: ', error, response);
   }
 });
 const contract = fs.readFileSync(path.join(__dirname, '/../assets/test0.tz'), 'utf-8');
