@@ -6,13 +6,14 @@ import request from 'request';
 import * as connector from './connector';
 
 // test connection to tezos
-request('http://node:8732/protocols', (error, response, body) => {
+request('http://node:18731/protocols', (error, response, body) => {
   if (!error && response.statusCode === 200) {
     console.log(body);
   } else {
     console.log('Error when contacting tezos node: ', error, response);
   }
 });
+
 const contract = fs.readFileSync(path.join(__dirname, '/../assets/test0.tz'), 'utf-8');
 connector.deployContract(contract, 100, '10tz');
 

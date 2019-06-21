@@ -1,26 +1,25 @@
 import Sotez, { crypto, forge, ledger, utility } from '../../node_modules/sotez/dist/node';
 // import Sotez, { crypto, forge, ledger, utility } from 'sotez';
 
-const key = process.env.TEZOS_KEY || 'edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh';
-const sotez = new Sotez('http://node:8732', 'main', 'main'); // todo: pass address as env var/parameter
+const key = 'edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh';
+const sotez = new Sotez('http://node:18731', 'main', 'main'); // todo: pass address as env var/parameter
 
 // todo: make functions return information
 export async function deployContract(code: string, balance: number = 0, init: string = '') {
-    await sotez.importKey('edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh');
-
+    await sotez.importKey(key);
     // test transfer
     await sotez.transfer({
-        to: 'tz1TGu6TN5GSez2ndXXeDX6LgUDvLzPLqgYV',
+        to: 'tz1gjaF81ZRRvdzjobyfVNsAeSC6PScjfQwN',
         amount: '7',
-      }).then((res) => console.log(res));
-    console.log(code, balance, init);
+      }).then((res) => console.log(res)).catch((err) => console.error('HAAHAHAHA::', err));
+    // console.log(code, balance, init);
 
-    await sotez.importKey('edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh');
+    await sotez.importKey(key);
     // origination does not seem to work
     await sotez.originate({
         balance,
         code,
-        delegate: 'edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh',
+        delegate: 'tz1gjaF81ZRRvdzjobyfVNsAeSC6PScjfQwN',
         init,
     }).then((res) => {
         console.log('result');
