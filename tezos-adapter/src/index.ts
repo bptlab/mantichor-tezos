@@ -10,7 +10,7 @@ import { ChoreographyPreprocessor } from './translator/ChoreographyPreprocessor'
 
 // test connection to tezos
 const main = async () => {
-  await sleep(10000);
+  await sleep(20000);
 
   await request.get('http://127.0.0.1:18731/protocols', (error, response, body) => {
     if (!error && response.statusCode === 200) {

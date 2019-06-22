@@ -3,7 +3,7 @@ import Sotez, { crypto, forge, ledger, utility } from '../../node_modules/sotez/
 
 const key = 'edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh';
 const sotez = new Sotez('http://127.0.0.1:18731', 'main', 'main');
-// todo: originate account for this adapter
+// TODO: originate account for this adapter
 
 const importKey = async () => {
     await sotez.importKey(key).then(console.log('Imported key.'))
@@ -13,25 +13,31 @@ const importKey = async () => {
 // todo: make functions return information
 export async function deployContract(code: string, balance: number = 0, init: string = '') {
     await importKey();
+    // test query
+    sotez.query(`/chains/main/blocks/head`)
+        .then((head) => console.log('Finished fetching head! \n', 'Current head is:\n ', head))
+        .catch((error) => console.error('Error fetching head:', error));
+
     // test transfer
     await sotez.transfer({
         amount: '7',
         to: 'tz1gjaF81ZRRvdzjobyfVNsAeSC6PScjfQwN',
-    }).then((res) => console.log('Transfer result:', res))
+    }).then((res) => console.log('Finished transfer! \n', 'Transfer result:\n', res))
         .catch((err) => console.error('Error sending transaction:', err));
-    // console.log(code, balance, init);
 
     // origination does not seem to work
+    // TODO: Originate separate account with sotez that is then used for originating the contract
+    console.log('Originating contact!');
     await sotez.originate({
         balance,
         code,
         delegate: 'tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx',
         init,
     }).then((res) => {
-        console.log('Origination result:', res);
+        console.log('Origination result:\n', res);
         return res;
     }).catch((err) => {
-        console.error('Error originating contract:', err);
+        console.error('Error originating contract:\n', err);
     });
 }
 
