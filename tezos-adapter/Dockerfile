@@ -14,10 +14,6 @@ RUN apt update && apt install libsystemd-dev libudev-dev libusb-1.0-0-dev -y
 
 COPY --from=build /adapter /
 
-# Expose ports
-EXPOSE 3000
-EXPOSE 8732
-
 # Copy sources and build
 RUN npm run build
 
