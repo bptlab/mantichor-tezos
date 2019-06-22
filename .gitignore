@@ -1,6 +1,3 @@
-# Ignore changes made to tezos node scripts
-nodes/
-
 # Ignore VS Code dir
 .vscode/
 
