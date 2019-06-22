@@ -24,8 +24,6 @@ const main = async () => {
   connector.deployContract(contract, 100, '10tz');
 
   // load XML
-  const order = fs.readFileSync(path.join(__dirname, '/../assets/order.bpmn'), 'utf-8');
-  const sample = fs.readFileSync(path.join(__dirname, '/../assets/sample.bpmn'), 'utf-8');
   const example = fs.readFileSync(path.join(__dirname, '/../assets/simple-diagram.bpmn'), 'utf-8');
 
   ChoreographyPreprocessor.parseXml(example);
