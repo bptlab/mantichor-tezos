@@ -11,12 +11,14 @@ RUN cp opam-2.0.3-x86_64-linux /usr/local/bin/opam
 RUN chmod a+x /usr/local/bin/opam
 
 # Install Dune
+# TODO: Pin version
 RUN git clone https://github.com/ocaml/dune.git
 WORKDIR /dune/
 RUN make release
 RUN make install
 
 # Download tezos
+# TODO: Pin version
 WORKDIR /
 RUN git clone https://gitlab.com/tezos/tezos.git
 
