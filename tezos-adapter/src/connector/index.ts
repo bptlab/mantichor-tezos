@@ -4,34 +4,38 @@ import Sotez, { crypto, forge, ledger, utility } from '../../node_modules/sotez/
 const key = 'edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh';
 const sotez = new Sotez('http://127.0.0.1:18731', 'main', 'main');
 
+const importKey = async () => {
+    await sotez.importKey(key).then(console.log('Imported key.'))
+    .catch((err) => console.error('Error importing key:', err));
+};
+
 // todo: make functions return information
 export async function deployContract(code: string, balance: number = 0, init: string = '') {
-    await sotez.importKey(key);
+    await importKey();
     // test transfer
     await sotez.transfer({
         amount: '7',
         to: 'tz1gjaF81ZRRvdzjobyfVNsAeSC6PScjfQwN',
-      }).then((res) => console.log(res)).catch((err) => console.error('Error sending transaction', err));
+    }).then((res) => console.log('Transfer result:', res))
+    .catch((err) => console.error('Error sending transaction:', err));
     // console.log(code, balance, init);
 
-    await sotez.importKey(key);
     // origination does not seem to work
     await sotez.originate({
         balance,
         code,
-        delegate: 'tz1gjaF81ZRRvdzjobyfVNsAeSC6PScjfQwN',
+        delegate: 'tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx',
         init,
     }).then((res) => {
-        console.log('result');
-        console.log(res);
+        console.log('Origination result:', res);
         return res;
     }).catch((err) => {
-        console.log(err);
+        console.error('Error originating contract:', err);
     });
 }
 
 export async function loadContract(contract: string) {
-    await sotez.importKey(key);
+    await importKey();
     // await sotez.query(`/chains/${chain}/blocks/${contract}`);
     await sotez.contract.load(contract).then((cont) => {
         console.log(cont);
@@ -40,7 +44,7 @@ export async function loadContract(contract: string) {
 }
 
 export async function sendTransactionOnContract(contract: string, parameter: string = '', amount: number = 0) {
-    await sotez.importKey(key);
+    await importKey();
     const result = await sotez.transfer({
         amount,
         parameter,
