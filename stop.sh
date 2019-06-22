@@ -1,3 +1,2 @@
 #! /usr/bin/env bash
-
-# TODO: Stop docker compose
+docker-compose down

@@ -1,4 +1,4 @@
-version: "3"
+version: "3.3"
 
 volumes:
   node_data:
@@ -6,22 +6,26 @@ volumes:
 
 services:
   node:
+    container_name: 'mantichor-tezos-node'
     build: "tezos-node"
     hostname: node
     ports:
       - "18731:18731"
     expose:
       - "18731"
+    network_mode: host
     volumes:
       - node_data:/var/run/tezos/node
       - client_data:/var/run/tezos/client
     # restart: on-failure
 
   adapter:
+    container_name: 'mantichor-tezos-adapter'
     build: "tezos-adapter"
     ports:
       - "3000:3000"
+    expose:
+      - "3000"
     depends_on:
       - "node"
-    links:
-      - node:node
+    network_mode: host 

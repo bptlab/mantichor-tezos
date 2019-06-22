@@ -2,7 +2,7 @@ import Sotez, { crypto, forge, ledger, utility } from '../../node_modules/sotez/
 // import Sotez, { crypto, forge, ledger, utility } from 'sotez';
 
 const key = 'edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh';
-const sotez = new Sotez('http://node:18731', 'main', 'main'); // todo: pass address as env var/parameter
+const sotez = new Sotez('http://127.0.0.1:18731', 'main', 'main');
 
 // todo: make functions return information
 export async function deployContract(code: string, balance: number = 0, init: string = '') {
@@ -11,7 +11,7 @@ export async function deployContract(code: string, balance: number = 0, init: st
     await sotez.transfer({
         to: 'tz1gjaF81ZRRvdzjobyfVNsAeSC6PScjfQwN',
         amount: '7',
-      }).then((res) => console.log(res)).catch((err) => console.error('HAAHAHAHA::', err));
+      }).then((res) => console.log(res)).catch((err) => console.error('Error sending transaction', err));
     // console.log(code, balance, init);
 
     await sotez.importKey(key);

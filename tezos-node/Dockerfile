@@ -17,7 +17,6 @@ RUN opam init --bare --disable-sandboxing
 RUN eval $(opam env)
 RUN make build-deps
 RUN eval $(opam env)
-RUN opam update && opam upgrade -y
 RUN opam config exec make
 RUN export PATH=/tezos:$PATH
 # RUN source ./src/bin_client/bash-completion.sh
