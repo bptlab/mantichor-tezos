@@ -9,8 +9,8 @@ export async function deployContract(code: string, balance: number = 0, init: st
     await sotez.importKey(key);
     // test transfer
     await sotez.transfer({
-        to: 'tz1gjaF81ZRRvdzjobyfVNsAeSC6PScjfQwN',
         amount: '7',
+        to: 'tz1gjaF81ZRRvdzjobyfVNsAeSC6PScjfQwN',
       }).then((res) => console.log(res)).catch((err) => console.error('Error sending transaction', err));
     // console.log(code, balance, init);
 
