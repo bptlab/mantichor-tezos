@@ -27,7 +27,7 @@ export class ContractGenerator {
 
   public static compileFiCode(code: FiCodeMetaData[]): Contract[] {
     return code.map((fiCode: FiCodeMetaData) => {
-      const compiled = fi.compile(fiCode);
+      const compiled = fi.compile(fiCode.code);
       return new Contract(compiled.ml, compiled.abi, fiCode.initialState, fiCode.code);
     });
   }
@@ -81,9 +81,9 @@ export class ContractGenerator {
     const states = tasks.length + joins.length;
     let result = '';
     for (let i = 0; i < states; i++) {
-      result += '(Pair false ';
+      result += '(Pair False ';
     }
-    result += 'false';
+    result += 'False';
     for (let i = 0; i < states; i++) {
       result += ')';
     }

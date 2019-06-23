@@ -6,9 +6,8 @@ import * as request from 'request-promise-native';
 import sleep from 'sleepjs';
 import { isNullOrUndefined } from 'util';
 import * as connector from './connector';
-import { Contract } from './models/Contract';
 import choreographyRouter from './routers/choreography';
-import { ChoreographyPreprocessor } from './translator/ChoreographyPreprocessor';
+import { ContractGenerator } from './translator/ContractGenerator';
 
 // test connection to tezos
 const main = async () => {
@@ -23,21 +22,23 @@ const main = async () => {
     }
   });
 
-  const contract = fs.readFileSync(path.join(__dirname, '/../assets/test0.tz'), 'utf-8');
+  // load XML
+  const example = fs.readFileSync(path.join(__dirname, '/../assets/twotasks.bpmn'), 'utf-8');
+  const contract = (await ContractGenerator.generateContractsFromBPMN(example))[0];
+
   const account = await connector.createAccount();
   if (!isNullOrUndefined(account)) {
     // test deploy
-    const code = 'parameter string;\nstorage string;\ncode {CAR; NIL operation; PAIR;};';
-    const initialState = '"hello"';
+    /*const code = 'parameter string;\nstorage string;\ncode {CAR; NIL operation; PAIR;};';
+    const initialState = '"hello"';*/
     const user = 'bootstrap1';
-    const result = await connector.deployContract(new Contract(code, {}, initialState), user);
-    console.info(`Deployed contract at: ${result}`);
+    const contractAddress = await connector.deployContract(contract, user);
+    console.info(`Deployed contract at: ${contractAddress}`);
+    if (await connector.callContractFunction(contract, contractAddress, 'bootstrap1', 'init')) {
+      // Print contract storage / state
+      console.info(await connector.getContractStorage(contractAddress));
+    }
   }
-
-  // load XML
-  const example = fs.readFileSync(path.join(__dirname, '/../assets/simple-diagram.bpmn'), 'utf-8');
-
-  ChoreographyPreprocessor.parseXml(example);
 
   const app = express();
   app.use(bodyParser.json());

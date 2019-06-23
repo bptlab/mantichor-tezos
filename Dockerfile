@@ -40,7 +40,7 @@ RUN curl -sL https://deb.nodesource.com/setup_11.x | bash
 RUN apt-get -y install nodejs gcc g++ make
 
 WORKDIR /adapter
-COPY ./tezos-adapter/package.json /adapter/
+COPY ./tezos-adapter/package* /adapter/
 # install packages
 RUN npm install
 COPY ./tezos-adapter /adapter
