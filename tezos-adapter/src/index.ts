@@ -13,6 +13,7 @@ import { ChoreographyPreprocessor } from './translator/ChoreographyPreprocessor'
 const main = async () => {
   await sleep(20000);
 
+  // test if node can be contacted
   await request.get('http://127.0.0.1:18731/protocols', (error, response, body) => {
     if (!error && response.statusCode === 200) {
       console.log('Activated protocols:', body);
@@ -24,6 +25,7 @@ const main = async () => {
   const contract = fs.readFileSync(path.join(__dirname, '/../assets/test0.tz'), 'utf-8');
   const account = await connector.createAccount();
   if (!isNullOrUndefined(account)) {
+    // test deploy
     await connector.deployContract(contract, 100, '10tz', account.secretKey);
   }
 

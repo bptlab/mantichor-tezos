@@ -17,25 +17,21 @@ const importKey = async (secretKey) => {
         .catch((err) => console.error('Error importing key:', err));
 };
 
+/* TODO: hardcode mapping from client to pair of {secretkey, identity, publickey}, since
+the tezos sandbox is unable to handle new accounts. -> https://gitlab.com/tezos/tezos/issues/346
+Therefore, we have to create a mapping from possible clients
+to bootstrapped tezos accounts. */
 export async function createAccount() {
-    await importKey(bootstrapKey);
-    sotez.account({
-        balance: 10,
-        delegatable: false,
-        delegate: bootstrapIdentity,
-        spendable: true,
-    }).then((res) => {
-
-        console.log('Originated Account!');
-        console.log(res.operations[0].metadata.operation_result.originated_contracts[0]);
-        console.log('Result was: \n', res);
-    });
+    return { publicKey: bootstrapPubkey, secretKey: bootstrapKey, identity: bootstrapIdentity };
 }
 
-// todo: make functions return information
+/* TODO: Orginiation using sotez in the sandbox fails due to unexpected key formats.
+And we can't add accounts using sotez, for which originating contracts works.
+So TODO: Originate contracts using etzt, or some other kind of mechanism, maybe involving the docker node. */
 export async function deployContract(code: string, balance: number = 0, init: string = '', secretKey: string) {
     await importKey(secretKey);
     console.log('Originating contact!');
+
     await sotez.originate({
         balance,
         code,
