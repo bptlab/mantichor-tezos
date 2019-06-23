@@ -38,6 +38,6 @@
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
     "sleepjs": "^3.0.0",
-    "sotez": "^0.4.5"
+    "tmp-promise": "^2.0.1"
   }
 }

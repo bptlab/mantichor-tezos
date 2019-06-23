@@ -2,8 +2,7 @@ FROM ubuntu:18.04
 
 # Install compilation dependencies
 RUN apt-get update -y
-RUN apt-get install -y rsync git m4 build-essential patch unzip bubblewrap wget pkg-config libgmp-dev libev-dev libhidapi-dev libsodium-dev libcurl4-gnutls-dev ocaml
-RUN apt-get install -y libgmp-dev m4 perl
+RUN apt-get install -y rsync git m4 build-essential patch unzip bubblewrap wget pkg-config libgmp-dev libev-dev libhidapi-dev libsodium-dev libcurl4-gnutls-dev ocaml libsystemd-dev libudev-dev perl curl libusb-1.0-0-dev
 
 # Install Opam
 RUN wget https://github.com/ocaml/opam/releases/download/2.0.3/opam-2.0.3-x86_64-linux
@@ -34,6 +33,20 @@ RUN export PATH=/tezos:$PATH
 # RUN source ./src/bin_client/bash-completion.sh
 RUN export TEZOS_CLIENT_UNSAFE_DISABLE_DISCLAIMER=Y
 
+# Tezos Adapter
+
+# Install Node.js
+RUN curl -sL https://deb.nodesource.com/setup_11.x | bash
+RUN apt-get -y install nodejs gcc g++ make
+
+WORKDIR /adapter
+COPY ./tezos-adapter/package.json /adapter/
+# install packages
+RUN npm install
+COPY ./tezos-adapter /adapter
+RUN npm run build
+
+WORKDIR /
 # Copy start script
 COPY ./start-tezos-sandbox.sh .
 
