@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as request from 'request-promise-native';
 import sleep from 'sleepjs';
+import { isNullOrUndefined } from 'util';
 import * as connector from './connector';
 import choreographyRouter from './routers/choreography';
 import { ChoreographyPreprocessor } from './translator/ChoreographyPreprocessor';
@@ -21,7 +22,10 @@ const main = async () => {
   });
 
   const contract = fs.readFileSync(path.join(__dirname, '/../assets/test0.tz'), 'utf-8');
-  connector.deployContract(contract, 100, '10tz');
+  const account = await connector.createAccount();
+  if (!isNullOrUndefined(account)) {
+    await connector.deployContract(contract, 100, '10tz', account.secretKey);
+  }
 
   // load XML
   const example = fs.readFileSync(path.join(__dirname, '/../assets/simple-diagram.bpmn'), 'utf-8');
