@@ -1,8 +1,7 @@
 // import Sotez, { crypto, forge, ledger, utility } from 'sotez';
 import { exec } from 'child_process';
 import * as fs from 'fs';
-
-import { withFile } from 'tmp-promise';
+import { Contract } from './../models/Contract';
 // import Sotez, { crypto, forge, ledger, utility } from '../../node_modules/sotez/dist/node';
 
 const bootstrapKey = 'edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh';
@@ -11,6 +10,10 @@ const bootstrapPubkey = 'edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav'
 
 const testIdentity = 'tz1gjaF81ZRRvdzjobyfVNsAeSC6PScjfQwN';
 const testPubkey = 'edpktzNbDAUjUk697W7gYg2CRuBQjyPxbEg8dLccYYwKSKvkPvjtV9';
+
+const nodeAddress = '127.0.0.1';
+const nodePort = '18731';
+const nodeBaseDir = '/var/run/tezos/client';
 
 // const sotez = new Sotez('http://127.0.0.1:18731', 'main', 'main');
 // TODO: originate account for this adapter
@@ -28,25 +31,47 @@ export async function createAccount() {
   return { publicKey: bootstrapPubkey, secretKey: bootstrapKey, identity: bootstrapIdentity };
 }
 
-/* TODO: Orginiation using sotez in the sandbox fails due to unexpected key formats.
-And we can't add accounts using sotez, for which originating contracts works.
-So TODO: Originate contracts using etzt, or some other kind of mechanism, maybe involving the docker node. */
-export async function deployContract(code: string, balance: number = 0, init: string = '', secretKey: string) {
-  withFile(async ({path, fd}) => {
-    code = `parameter string;
-storage string;
-code {CAR; NIL operation; PAIR;};`;
-    init = '"hello"';
-    const user = 'bootstrap1';
+export async function deployContract(contract: Contract, user: string): Promise<string> {
+  console.info('Start deploying contract');
+  const contractName = `${Date.now()}-contract`;
+  const path = `/tmp/${contractName}`;
 
-    fs.writeFileSync(path, code);
-    // when this function returns or throws - release the file
-    exec(`/tezos/tezos-client -A 127.0.0.1 -P 18731 -base-dir /var/run/tezos/client originate contract ${Date.now()}-choreo for ${user} transferring 1 from ${user} running /adapter/src/connector/temp.tz --init '${init}' --burn-cap 100`, (err, stdout, stderr) => {
-      console.info (err);
-      console.info (stdout);
-      console.info (stderr);
-    });
-  });
+  let contractAddress = '';
+
+  const command = `/tezos/tezos-client -A ${nodeAddress} -P ${nodePort} ` +
+    `-base-dir ${nodeBaseDir} originate contract ${contractName} ` +
+    `for ${user} transferring 1 from ${user} running ${path} --init '${contract.getInitialState()}' --burn-cap 100`;
+
+  try {
+    fs.writeFileSync(path, contract.getCode());
+    try {
+      const result = await new Promise((resolve: (value: string) => void, reject: (reason: string | Error) => void) => {
+        exec(command, (error, stdout, stderr) => {
+          if (stdout) {
+            resolve(stdout);
+          }
+          if (stderr) {
+            reject(stderr);
+          }
+          reject(error);
+        });
+      });
+      console.info(result);
+      console.info('Contract deployed');
+      const regexResult = result.match(/.*New contract (\w+) originated\..*/i);
+      if (regexResult.length > 1) {
+        contractAddress = regexResult[1];
+      }
+    } catch (error) {
+      console.info('Error deploying contract');
+      console.error(error);
+    }
+    fs.unlinkSync(path);
+  } catch (error) {
+    console.info('Error creating/unlinking temporary contract file');
+    console.error(error);
+  }
+  return contractAddress;
 }
 
 export async function loadContract(contract: string, secretKey: string) {

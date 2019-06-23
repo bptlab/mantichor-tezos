@@ -6,6 +6,7 @@ import * as request from 'request-promise-native';
 import sleep from 'sleepjs';
 import { isNullOrUndefined } from 'util';
 import * as connector from './connector';
+import { Contract } from './models/Contract';
 import choreographyRouter from './routers/choreography';
 import { ChoreographyPreprocessor } from './translator/ChoreographyPreprocessor';
 
@@ -26,7 +27,11 @@ const main = async () => {
   const account = await connector.createAccount();
   if (!isNullOrUndefined(account)) {
     // test deploy
-    await connector.deployContract(contract, 100, '10tz', account.secretKey);
+    const code = 'parameter string;\nstorage string;\ncode {CAR; NIL operation; PAIR;};';
+    const initialState = '"hello"';
+    const user = 'bootstrap1';
+    const result = await connector.deployContract(new Contract(code, {}, initialState), user);
+    console.info(`Deployed contract at: ${result}`);
   }
 
   // load XML
