@@ -31,10 +31,9 @@ const main = async () => {
     // test deploy
     /*const code = 'parameter string;\nstorage string;\ncode {CAR; NIL operation; PAIR;};';
     const initialState = '"hello"';*/
-    const user = 'bootstrap1';
-    const contractAddress = await connector.deployContract(contract, user);
+    const contractAddress = await connector.deployContract(contract, account.identifier);
     console.info(`Deployed contract at: ${contractAddress}`);
-    if (await connector.callContractFunction(contract, contractAddress, 'bootstrap1', 'init')) {
+    if (await connector.callContractFunction(contract, contractAddress, account.identifier, 'init')) {
       // Print contract storage / state
       console.info(await connector.getContractStorage(contractAddress));
     }

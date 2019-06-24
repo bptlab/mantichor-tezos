@@ -1,5 +1,7 @@
 FROM ubuntu:18.04
 
+##### TEZOS NODE #####
+
 # Install compilation dependencies
 RUN apt-get update -y
 RUN apt-get install -y rsync git m4 build-essential patch unzip bubblewrap wget pkg-config libgmp-dev libev-dev libhidapi-dev libsodium-dev libcurl4-gnutls-dev ocaml libsystemd-dev libudev-dev perl curl libusb-1.0-0-dev
@@ -33,7 +35,7 @@ RUN export PATH=/tezos:$PATH
 # RUN source ./src/bin_client/bash-completion.sh
 RUN export TEZOS_CLIENT_UNSAFE_DISABLE_DISCLAIMER=Y
 
-# Tezos Adapter
+##### TEZOS ADAPTER #####
 
 # Install Node.js
 RUN curl -sL https://deb.nodesource.com/setup_11.x | bash

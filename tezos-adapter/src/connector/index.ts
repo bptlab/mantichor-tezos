@@ -2,6 +2,7 @@ import { exec } from 'child_process';
 import fi from 'fi-compiler';
 import * as fs from 'fs';
 
+import { Account } from './../models/Account';
 import { Contract } from './../models/Contract';
 
 const bootstrapKey = 'edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh';
@@ -21,8 +22,14 @@ const tezosBaseDir = '/var/run/tezos/client';
 the tezos sandbox is unable to handle new accounts. -> https://gitlab.com/tezos/tezos/issues/346
 Therefore, we have to create a mapping from possible clients
 to bootstrapped tezos accounts. */
-export async function createAccount() {
-  return { publicKey: bootstrapPubkey, secretKey: bootstrapKey, identity: bootstrapIdentity };
+export async function createAccount(): Promise<Account> {
+  const account: Account = {
+    identifier: 'bootstrap1',
+    identity: bootstrapIdentity,
+    publicKey: bootstrapPubkey,
+    secretKey: bootstrapKey,
+  };
+  return account;
 }
 
 async function executeCommand(command: string): Promise<string> {
