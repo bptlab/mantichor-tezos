@@ -55,19 +55,18 @@ export async function deployContract(contract: Contract, user: string): Promise<
     fs.writeFileSync(path, contract.getCode());
     try {
       const result = await executeCommand(command);
-      console.info(result);
       console.info('Contract deployed');
       const regexResult = result.match(/.*New contract (\w+) originated\..*/i);
       if (regexResult.length > 1) {
         contractAddress = regexResult[1];
       }
     } catch (error) {
-      console.info('Error deploying contract');
+      console.error('Error deploying contract');
       console.error(error);
     }
     fs.unlinkSync(path);
   } catch (error) {
-    console.info('Error creating/unlinking temporary contract file');
+    console.error('Error creating/unlinking temporary contract file');
     console.error(error);
   }
   return contractAddress;
@@ -77,8 +76,7 @@ export async function getContractStorage(address: string): Promise<string> {
   const command = `get script storage for ${address}`;
   let storage = '';
   try {
-    const result = await executeCommand(command);
-    storage = result;
+    storage = await executeCommand(command);
   } catch (error) {
     console.error(error);
   }
@@ -98,11 +96,11 @@ export async function callContractFunction(
       console.info(`Executed function ${functionName} successfully`);
       executed = true;
     } catch (error) {
-      console.info(`Error executing function '${functionName}' for contract '${address}'`);
+      console.error(`Error executing function '${functionName}' for contract '${address}'`);
       console.error(error);
     }
   } catch (error) {
-    console.info(error);
+    console.error(error);
   }
   return executed;
 }

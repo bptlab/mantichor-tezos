@@ -18,7 +18,7 @@ const main = async () => {
     if (!error && response.statusCode === 200) {
       console.log('Activated protocols:', body);
     } else {
-      console.log('Error when contacting tezos node: ', error, response);
+      console.error('Error when contacting tezos node: ', error, response);
     }
   });
 

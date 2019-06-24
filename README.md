@@ -1,10 +1,16 @@
 # Mantichor Tezos
 
-Tezos Blockchain Choreography Converter and Backend
+Tezos Blockchain Choreography Converter and Backend based on the Tezos Blockchain.
 
-Make sure that the latest versions of `docker` and `docker-compose` are installed.
+## Dependencies
+
+Make sure that the latest versions of [`docker`](https://docs.docker.com/install/) and [`docker-compose`](https://docs.docker.com/compose/install/) are installed.
+
+## Starting
 
 Start the adapter using `docker-compose up --build` or `start.sh`.
+
+## Stopping
 
 Stop the tool using `docker-compose down` or `stop.sh`.
 
