@@ -9,6 +9,7 @@ import { ChoreographyPreprocessor } from './ChoreographyPreprocessor';
 interface FiCodeMetaData {
   code: string;
   initialState: string;
+  taskNames: string[];
 }
 
 export class ContractGenerator {
@@ -28,7 +29,7 @@ export class ContractGenerator {
   public static compileFiCode(code: FiCodeMetaData[]): Contract[] {
     return code.map((fiCode: FiCodeMetaData) => {
       const compiled = fi.compile(fiCode.code);
-      return new Contract(compiled.ml, compiled.abi, fiCode.initialState, fiCode.code);
+      return new Contract(compiled.ml, compiled.abi, fiCode.initialState, fiCode.taskNames, fiCode.code);
     });
   }
 
@@ -39,7 +40,7 @@ export class ContractGenerator {
       const joins = choreography.getAndJoinGateways();
 
       // generate storage
-      const storage = ContractGenerator.generateStorage(tasks, joins);
+      const {storage, taskNames} = ContractGenerator.generateStorage(tasks, joins);
 
       // generate entries
       const initEntry = ContractGenerator.generateInitEntry(elements);
@@ -54,6 +55,7 @@ export class ContractGenerator {
       return {
         code: storage + initEntry + taskEntries,
         initialState,
+        taskNames,
       };
     });
     return fiSources;
@@ -90,9 +92,13 @@ export class ContractGenerator {
     return result;
   }
 
-  private static generateStorage(tasks: ChoreographyElement[], joins: ChoreographyElement[]): string {
-    const taskStates = tasks.map((task: ChoreographyElement) =>
-      `storage bool ${task.id}_active;\n`).join('');
+  private static generateStorage(
+    tasks: ChoreographyElement[], joins: ChoreographyElement[]): {storage: string, taskNames: string[]} {
+    const taskNames = [];
+    const taskStates = tasks.map((task: ChoreographyElement) => {
+      taskNames.push(task.id);
+      return `storage bool ${task.id}_active;\n`;
+    }).join('');
 
     const joinStates = joins.map((join: ChoreographyElement) =>
           join.getPreviousElements()
@@ -102,9 +108,10 @@ export class ContractGenerator {
               `storage bool ${element.id}_active;\n`,
             ).join('')).join('');
 
-    return taskStates +
-      joinStates +
-      'storage bool finished;\n\n';
+    return {
+      storage: (taskStates + joinStates + 'storage bool finished;\n\n'),
+      taskNames,
+    };
   }
 
   private static generateTaskEntry(task: ChoreographyElement, joins: ChoreographyElement[]): string {

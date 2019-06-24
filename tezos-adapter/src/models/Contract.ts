@@ -3,12 +3,14 @@ export class Contract {
   private code: string;
   private fiCode: string;
   private initialState: string;
+  private taskNames: string[];
 
-  constructor(code: string, abi: object, initialState: string, fiCode?: string) {
+  constructor(code: string, abi: object, initialState: string, taskNames: string[], fiCode?: string) {
     this.abi = abi;
     this.code = code;
     this.fiCode = fiCode;
     this.initialState = initialState;
+    this.taskNames = taskNames;
   }
 
   public getAbi(): object {
@@ -25,5 +27,9 @@ export class Contract {
 
   public getInitialState(): string {
     return this.initialState;
+  }
+
+  public getTaskNames(): string[] {
+    return this.taskNames;
   }
 }

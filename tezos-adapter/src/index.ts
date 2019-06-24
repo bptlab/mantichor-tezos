@@ -6,6 +6,7 @@ import * as request from 'request-promise-native';
 import sleep from 'sleepjs';
 import { isNullOrUndefined } from 'util';
 import * as connector from './connector';
+import { deployChoreography, executeFunction, getActiveTasks } from './connector/ContractHelper';
 import choreographyRouter from './routers/choreography';
 import { ContractGenerator } from './translator/ContractGenerator';
 
@@ -33,19 +34,21 @@ const main = async () => {
   }
 
   // load XML
-  const example = fs.readFileSync(path.join(__dirname, '/../assets/twotasks.bpmn'), 'utf-8');
-  const contract = (await ContractGenerator.generateContractsFromBPMN(example))[0];
+  const xml = fs.readFileSync(path.join(__dirname, '/../assets/twotasks.bpmn'), 'utf-8');
 
   const account = await connector.createAccount();
   if (!isNullOrUndefined(account)) {
     // test deploy
     /*const code = 'parameter string;\nstorage string;\ncode {CAR; NIL operation; PAIR;};';
     const initialState = '"hello"';*/
-    const contractAddress = await connector.deployContract(contract, account.identifier);
+    const contractAddress = await deployChoreography(xml, account);
     console.info(`Deployed contract at: ${contractAddress}`);
-    if (await connector.callContractFunction(contract, contractAddress, account.identifier, 'init')) {
+    console.info(await connector.getContractStorage(contractAddress));
+    console.info(await getActiveTasks(xml, contractAddress));
+    if (await executeFunction(xml, contractAddress, account, 'init')) {
       // Print contract storage / state
       console.info(await connector.getContractStorage(contractAddress));
+      console.info(await getActiveTasks(xml, contractAddress));
     }
   }
 
