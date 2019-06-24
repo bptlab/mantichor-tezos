@@ -92,22 +92,11 @@ export async function getContractStorage(address: string): Promise<string> {
 
 export async function callContractFunction(
   contract: Contract, address: string, user: string, functionName: string): Promise<boolean> {
-  let executed = false;
-  try {
-    fi.abi.load(contract.getAbi());
-    const argument = fi.abi.entry(functionName);
-    const command = `transfer 0 from ${user} to ${address} --arg '${argument}' --burn-cap 100`;
-    try {
-      const result = await executeCommand(command);
-      console.info(result);
-      console.info(`Executed function ${functionName} successfully`);
-      executed = true;
-    } catch (error) {
-      console.error(`Error executing function '${functionName}' for contract '${address}'`);
-      console.error(error);
-    }
-  } catch (error) {
-    console.error(error);
-  }
-  return executed;
+  fi.abi.load(contract.getAbi());
+  const argument = fi.abi.entry(functionName);
+  const command = `transfer 0 from ${user} to ${address} --arg '${argument}' --burn-cap 100`;
+  const result = await executeCommand(command);
+  console.info(result);
+  console.info(`Executed function ${functionName} successfully`);
+  return true;
 }
