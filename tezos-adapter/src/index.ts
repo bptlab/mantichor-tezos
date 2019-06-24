@@ -14,13 +14,23 @@ const main = async () => {
   await sleep(20000);
 
   // test if node can be contacted
+  let connected = false;
   await request.get('http://127.0.0.1:18731/protocols', (error, response, body) => {
     if (!error && response.statusCode === 200) {
       console.log('Activated protocols:', body);
+      connected = true;
     } else {
       console.error('Error when contacting tezos node: ', error, response);
+      connected = false;
     }
+  }).catch((error) => {
+    console.error(error);
   });
+
+  if (!connected) {
+    console.error('Could not contact tezos node, shutting down!');
+    return;
+  }
 
   // load XML
   const example = fs.readFileSync(path.join(__dirname, '/../assets/twotasks.bpmn'), 'utf-8');
