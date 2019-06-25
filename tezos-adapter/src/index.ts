@@ -8,9 +8,7 @@ import { isNullOrUndefined } from 'util';
 import * as connector from './connector';
 import { deployChoreography, executeFunction, getActiveTasks } from './connector/ContractHelper';
 import choreographyRouter from './routers/choreography';
-import { ContractGenerator } from './translator/ContractGenerator';
 
-// test connection to tezos
 const main = async () => {
   await sleep(20000);
 
@@ -38,17 +36,15 @@ const main = async () => {
 
   const account = await connector.createAccount();
   if (!isNullOrUndefined(account)) {
-    // test deploy
-    /*const code = 'parameter string;\nstorage string;\ncode {CAR; NIL operation; PAIR;};';
-    const initialState = '"hello"';*/
     const contractAddress = await deployChoreography(xml, account);
     console.info(`Deployed contract at: ${contractAddress}`);
-    console.info(await connector.getContractStorage(contractAddress));
-    console.info(await getActiveTasks(xml, contractAddress));
+    console.info('Contact Storage:', await connector.getContractStorage(contractAddress));
+    console.info('Active Tasks:', await getActiveTasks(xml, contractAddress));
     if (await executeFunction(xml, contractAddress, account, 'init')) {
       // Print contract storage / state
-      console.info(await connector.getContractStorage(contractAddress));
-      console.info(await getActiveTasks(xml, contractAddress));
+      console.info('Contact Storage:', await connector.getContractStorage(contractAddress));
+      console.info('Active Tasks:', await getActiveTasks(xml, contractAddress));
+      console.info('Finished test deployment successfully! \n');
     }
   }
 

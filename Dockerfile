@@ -32,8 +32,7 @@ RUN make build-deps
 RUN eval $(opam env)
 RUN opam config exec make
 RUN export PATH=/tezos:$PATH
-# RUN source ./src/bin_client/bash-completion.sh
-RUN export TEZOS_CLIENT_UNSAFE_DISABLE_DISCLAIMER=Y
+
 
 ##### TEZOS ADAPTER #####
 
