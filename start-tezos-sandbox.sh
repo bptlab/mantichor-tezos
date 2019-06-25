@@ -2,6 +2,9 @@
 # allow alias expansion
 shopt -s expand_aliases
 
+# suppress tezos client warnings
+export TEZOS_CLIENT_UNSAFE_DISABLE_DISCLAIMER=Y
+
 # TODO: Detect whether the node and client have been started before and skip initializing them
 
 # start sandboxed node
