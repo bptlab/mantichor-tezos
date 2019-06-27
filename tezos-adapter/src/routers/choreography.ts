@@ -15,20 +15,20 @@ router.post('/choreographies', async (request, response) => {
   });
 });
 
-router.post('/choreographies/{choreographyId}/tasks/execute', async (request, response) => {
+router.post('/choreographies/:choreographyId/tasks/execute', async (request, response) => {
   const { choreographyId } = request.params;
-  const { task, xml } = request.body;
-
-  await executeFunction(xml, choreographyId, await account, task);
+  const { tasks, xml } = request.body;
+  // TODO: Implement task hierarchy
+  await executeFunction(xml, choreographyId, await account, tasks[0]);
   response.sendStatus(200);
 });
 
-router.get('/choreographies/{choreographyId}/tasks', (request, response) => {
+router.post('/choreographies/:choreographyId/tasks', async (request, response) => {
   const { choreographyId } = request.params;
   const { enabled } = request.query;
   const { xml } = request.body;
-  const result = getActiveTasks(xml, choreographyId);
-  response.send(result);
+  const tasks = await getActiveTasks(xml, choreographyId);
+  response.send({tasks});
 });
 
 export default router;

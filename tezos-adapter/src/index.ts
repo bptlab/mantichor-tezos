@@ -31,23 +31,6 @@ const main = async () => {
     return;
   }
 
-  // load XML
-  const xml = fs.readFileSync(path.join(__dirname, '/../assets/twotasks.bpmn'), 'utf-8');
-
-  const account = await connector.createAccount();
-  if (!isNullOrUndefined(account)) {
-    const contractAddress = await deployChoreography(xml, account);
-    console.info(`Deployed contract at: ${contractAddress}`);
-    console.info('Contact Storage:', await connector.getContractStorage(contractAddress));
-    console.info('Active Tasks:', await getActiveTasks(xml, contractAddress));
-    if (await executeFunction(xml, contractAddress, account, 'init')) {
-      // Print contract storage / state
-      console.info('Contact Storage:', await connector.getContractStorage(contractAddress));
-      console.info('Active Tasks:', await getActiveTasks(xml, contractAddress));
-      console.info('Finished test deployment successfully! \n');
-    }
-  }
-
   const app = express();
   app.use(bodyParser.json());
   app.use(choreographyRouter);
