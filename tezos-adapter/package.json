@@ -37,7 +37,6 @@
     "fi-compiler": "^0.2.0",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
-    "sleepjs": "^3.0.0",
-    "sotez": "^0.4.5"
+    "sleepjs": "^3.0.0"
   }
 }

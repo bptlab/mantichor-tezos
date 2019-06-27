@@ -2,6 +2,9 @@
 # allow alias expansion
 shopt -s expand_aliases
 
+# suppress tezos client warnings
+export TEZOS_CLIENT_UNSAFE_DISABLE_DISCLAIMER=Y
+
 # TODO: Detect whether the node and client have been started before and skip initializing them
 
 # start sandboxed node
@@ -33,9 +36,12 @@ echo "-> activated chains:"
 echo "-> known addresses:"
 /tezos/src/bin_client//../../_build/default/src/bin_client/main_client.exe -base-dir /var/run/tezos/client -addr 127.0.0.1 -port 18731 list known addresses
 
+cd /adapter || exit 1
+npm run serve &
+
 # Bake in a loop every 20 seconds, since sandbox does not come with a baker node
 while :
-do  
+do
     echo "-> baking for bootstrap1 account"
 	/tezos/src/bin_client//../../_build/default/src/bin_client/main_client.exe -base-dir /var/run/tezos/client -addr 127.0.0.1 -port 18731 bake for bootstrap1
 	sleep 20

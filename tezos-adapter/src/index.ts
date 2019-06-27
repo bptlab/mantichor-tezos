@@ -6,33 +6,30 @@ import * as request from 'request-promise-native';
 import sleep from 'sleepjs';
 import { isNullOrUndefined } from 'util';
 import * as connector from './connector';
+import { deployChoreography, executeFunction, getActiveTasks } from './connector/ContractHelper';
 import choreographyRouter from './routers/choreography';
-import { ChoreographyPreprocessor } from './translator/ChoreographyPreprocessor';
 
-// test connection to tezos
 const main = async () => {
   await sleep(20000);
 
   // test if node can be contacted
+  let connected = false;
   await request.get('http://127.0.0.1:18731/protocols', (error, response, body) => {
     if (!error && response.statusCode === 200) {
       console.log('Activated protocols:', body);
+      connected = true;
     } else {
-      console.log('Error when contacting tezos node: ', error, response);
+      console.error('Error when contacting tezos node: ', error, response);
+      connected = false;
     }
+  }).catch((error) => {
+    console.error(error);
   });
 
-  const contract = fs.readFileSync(path.join(__dirname, '/../assets/test0.tz'), 'utf-8');
-  const account = await connector.createAccount();
-  if (!isNullOrUndefined(account)) {
-    // test deploy
-    await connector.deployContract(contract, 100, '10tz', account.secretKey);
+  if (!connected) {
+    console.error('Could not contact tezos node, shutting down!');
+    return;
   }
-
-  // load XML
-  const example = fs.readFileSync(path.join(__dirname, '/../assets/simple-diagram.bpmn'), 'utf-8');
-
-  ChoreographyPreprocessor.parseXml(example);
 
   const app = express();
   app.use(bodyParser.json());

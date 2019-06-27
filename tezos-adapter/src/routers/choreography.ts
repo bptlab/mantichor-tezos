@@ -1,37 +1,34 @@
 import { Router } from 'express';
+import * as connector from '../connector';
+import { deployChoreography, executeFunction, getActiveTasks } from '../connector/ContractHelper';
+import { Contract } from '../models/Contract';
 import { ContractGenerator } from '../translator/ContractGenerator';
-import { Contract } from './../models/Contract';
 
 const router = Router();
+const account = connector.createAccount();
 
 router.post('/choreographies', async (request, response) => {
   const { xml, id } = request.body;
-  const contracts: Contract[] = await ContractGenerator
-    .generateContractsFromBPMN(xml);
-
-  const address = 'no address yet';
-  // TODO: Deploy contract
+  const address = await deployChoreography(xml, await account);
   response.send({
     address,
   });
 });
 
-router.post('/choreographies/{choreographyId}/tasks/execute', (request, response) => {
+router.post('/choreographies/:choreographyId/tasks/execute', async (request, response) => {
   const { choreographyId } = request.params;
-  const { task } = request.body;
-
-  // `task` is an array of strings
-  // TODO: Execute given tasks
-  response.status(500).send({message: 'Execute Tasks is not implemented yet'});
+  const { tasks, xml } = request.body;
+  // TODO: Implement task hierarchy
+  await executeFunction(xml, choreographyId, await account, tasks[0]);
+  response.sendStatus(200);
 });
 
-router.get('/choreographies/{choreographyId}/tasks:', (request, response) => {
+router.post('/choreographies/:choreographyId/tasks', async (request, response) => {
   const { choreographyId } = request.params;
   const { enabled } = request.query;
-
-  // `enabled` specifies requested tasks
-  // TODO: List accessible tasks
-  response.status(500).send({message: 'Get Tasks is not implemented yet'});
+  const { xml } = request.body;
+  const tasks = await getActiveTasks(xml, choreographyId);
+  response.send({tasks});
 });
 
 export default router;
