@@ -11,21 +11,20 @@ RUN wget https://github.com/ocaml/opam/releases/download/2.0.3/opam-2.0.3-x86_64
 RUN cp opam-2.0.3-x86_64-linux /usr/local/bin/opam
 RUN chmod a+x /usr/local/bin/opam
 
-# Install Dune
-# TODO: Pin version
+# Install Dune (27.06.19)
 RUN git clone https://github.com/ocaml/dune.git
 WORKDIR /dune/
+RUN git checkout tags/1.10.0
 RUN make release
 RUN make install
 
 # Download tezos
-# TODO: Pin version
 WORKDIR /
 RUN git clone https://gitlab.com/tezos/tezos.git
 
-# Build alphanet node and client
+# Build alphanet node and client (alphanet: 27.06.19)
 WORKDIR /tezos/
-RUN git checkout alphanet
+RUN git checkout 8015f6f24cd1bda8d533a838ace6857f115e8330 
 RUN opam init --bare --disable-sandboxing
 RUN eval $(opam env)
 RUN make build-deps
