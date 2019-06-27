@@ -97,6 +97,10 @@ export async function callContractFunction(
   const command = `transfer 0 from ${user} to ${address} --arg '${argument}' --burn-cap 100`;
   const result = await executeCommand(command);
   console.info(result);
+  if (result.match(/.*This operation FAILED\..*/g)) {
+    console.info(`Execution of function ${functionName} failed`);
+    return false;
+  }
   console.info(`Executed function ${functionName} successfully`);
   return true;
 }

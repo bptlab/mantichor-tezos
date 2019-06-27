@@ -62,7 +62,7 @@ export class ContractGenerator {
   }
 
   private static generateInitEntry(elements: ChoreographyElement[]): string {
-    const entryPoint = 'entry init() {\n';
+    const entryPoint = 'entry init() {\n  assert(storage.initialized == bool false);\n';
 
     const startEvent = elements
         .filter((element: ChoreographyElement) => is('bpmn:StartEvent')(element.getElement()));
@@ -76,17 +76,17 @@ export class ContractGenerator {
 
     return entryPoint +
       activateInitialElements +
-      '}\n\n';
+      '  storage.initialized = bool true;\n}\n\n';
   }
 
   private static generateInitialState(tasks: ChoreographyElement[], joins: ChoreographyElement[]): string {
-    const states = tasks.length + joins.length;
+    const states = tasks.length + joins.length + 2; // Initialized and finished state
     let result = '';
-    for (let i = 0; i < states; i++) {
+    for (let i = 1; i < states; i++) {
       result += '(Pair False ';
     }
     result += 'False';
-    for (let i = 0; i < states; i++) {
+    for (let i = 1; i < states; i++) {
       result += ')';
     }
     return result;
@@ -109,7 +109,7 @@ export class ContractGenerator {
             ).join('')).join('');
 
     return {
-      storage: (taskStates + joinStates + 'storage bool finished;\n\n'),
+      storage: (taskStates + joinStates + 'storage bool initialized;\nstorage bool finished;\n\n'),
       taskNames,
     };
   }

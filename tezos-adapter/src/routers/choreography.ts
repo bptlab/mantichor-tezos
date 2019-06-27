@@ -1,8 +1,6 @@
 import { Router } from 'express';
 import * as connector from '../connector';
 import { deployChoreography, executeFunction, getActiveTasks } from '../connector/ContractHelper';
-import { Contract } from '../models/Contract';
-import { ContractGenerator } from '../translator/ContractGenerator';
 
 const router = Router();
 const account = connector.createAccount();
@@ -19,8 +17,11 @@ router.post('/choreographies/:choreographyId/tasks/execute', async (request, res
   const { choreographyId } = request.params;
   const { tasks, xml } = request.body;
   // TODO: Implement task hierarchy
-  await executeFunction(xml, choreographyId, await account, tasks[0]);
-  response.sendStatus(200);
+  if (await executeFunction(xml, choreographyId, await account, tasks[0])) {
+    response.sendStatus(200);
+  } else {
+    response.sendStatus(500);
+  }
 });
 
 router.post('/choreographies/:choreographyId/tasks', async (request, response) => {

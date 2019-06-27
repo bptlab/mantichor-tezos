@@ -1,12 +1,7 @@
 import bodyParser from 'body-parser';
 import express from 'express';
-import * as fs from 'fs';
-import * as path from 'path';
 import * as request from 'request-promise-native';
 import sleep from 'sleepjs';
-import { isNullOrUndefined } from 'util';
-import * as connector from './connector';
-import { deployChoreography, executeFunction, getActiveTasks } from './connector/ContractHelper';
 import choreographyRouter from './routers/choreography';
 
 const main = async () => {
