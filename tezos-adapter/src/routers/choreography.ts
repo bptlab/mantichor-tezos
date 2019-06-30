@@ -13,7 +13,7 @@ const choreographyRoleMappings: ChoreographyMappings[] = [];
 router.post('/choreographies', async (request, response) => {
   const { xml, id, mappings }: XMLWithRoleMapping = request.body;
   choreographyRoleMappings.push({ mappings, id });
-  const address = await deployChoreography(xml, await connector.getDefaultAccount());
+  const address = await deployChoreography(xml, connector.getDefaultAccount());
   response.send({
     address,
   });

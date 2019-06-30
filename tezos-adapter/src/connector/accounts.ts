@@ -1,5 +1,3 @@
-import { isNullOrUndefined } from 'util';
-import { RoleMapping } from '../models/RoleMapping';
 import { Account } from './../models/Account';
 
 export const bootstrap1: Account = {
@@ -37,22 +35,4 @@ export const bootstrap5: Account = {
     secretKey: 'edsk4QLrcijEffxV31gGdN2HU7UpyJjA8drFoNcmnB28n89YjPNRFm',
 };
 
-const accounts = [bootstrap1, bootstrap2, bootstrap3, bootstrap3, bootstrap4, bootstrap5];
-
-export function getAccountForIdentity(identity: string): Account {
-    return accounts.find((account) => account.identity === identity);
-}
-
-export function getAccountForIdentifier(identifier: string): Account {
-    return accounts.find((account) => account.identifier === identifier);
-}
-
-export function getAccountForRoleWithMapping(role: string, mappings: RoleMapping[]): Account {
-    const mapping = mappings.find((map) => map.role === role);
-    const account = getAccountForIdentifier(mapping.identifier);
-    if (isNullOrUndefined(account)) {
-        return bootstrap2;
-    } else {
-        return account;
-    }
-}
+export const accounts = [bootstrap1, bootstrap2, bootstrap3, bootstrap3, bootstrap4, bootstrap5];
