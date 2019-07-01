@@ -11,10 +11,10 @@ services:
     hostname: node
     ports:
       - "18731:18731"
-      - "73205:73205"
+      - "7320:7320"
     expose:
       - "18731"
-      - "73205"
+      - "7320"
     network_mode: host
     volumes:
       - node_data:/var/run/tezos/node

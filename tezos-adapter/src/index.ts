@@ -29,7 +29,7 @@ const main = async () => {
   const app = express();
   app.use(bodyParser.json());
   app.use(choreographyRouter);
-  app.listen(73205, () => console.log('Local Tezos Blockchain Adapter listening on port 3000!'));
+  app.listen(7320, () => console.log('Local Tezos Blockchain Adapter listening on port 3000!'));
 
 };
 main();
