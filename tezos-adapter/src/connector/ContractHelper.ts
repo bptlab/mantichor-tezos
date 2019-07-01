@@ -15,7 +15,7 @@ export async function executeFunction(
   return callContractFunction(contract, address, account.identifier, functionName);
 }
 
-export async function getActiveTasks(xml: string, address: string): Promise<string[]> {
+export async function getActiveTasks(xml: string, address: string): Promise<string[][]> {
   const contract = (await ContractGenerator.generateContractsFromBPMN(xml))[0];
   const storage = await getContractStorage(address);
   const regex = /(true|false)/gi;
@@ -31,15 +31,15 @@ export async function getActiveTasks(xml: string, address: string): Promise<stri
 
   const result = contract
     .getTaskNames()
-    .reduce((activeTasks: string[], taskName: string, index: number): string[] => {
+    .reduce((activeTasks: string[][], taskName: string, index: number): string[][] => {
       if (states[index].toLowerCase() === 'true') {
-        activeTasks.push(taskName);
+        activeTasks.push([taskName]);
       }
       return activeTasks;
     }, []);
 
   if (states[states.length - 1].toLowerCase() === 'true') {
-    result.push('finished');
+    result.push(['finished']);
   }
 
   return result;

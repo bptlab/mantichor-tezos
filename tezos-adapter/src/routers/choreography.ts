@@ -15,9 +15,9 @@ router.post('/choreographies', async (request, response) => {
 
 router.post('/choreographies/:choreographyId/tasks/execute', async (request, response) => {
   const { choreographyId } = request.params;
-  const { tasks, xml } = request.body;
+  const { task, xml } = request.body;
   // TODO: Implement task hierarchy
-  if (await executeFunction(xml, choreographyId, await account, tasks[0])) {
+  if (await executeFunction(xml, choreographyId, await account, task[0])) {
     response.sendStatus(200);
   } else {
     response.sendStatus(500);
