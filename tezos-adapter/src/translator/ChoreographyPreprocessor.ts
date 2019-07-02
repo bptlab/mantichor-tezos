@@ -9,7 +9,8 @@ import {
   RootElement,
   SequenceFlow,
 } from 'bpmn-moddle';
-import {is, parseModdle} from '../helper/helpers';
+import { isNullOrUndefined } from 'util';
+import { is, parseModdle } from '../helper/helpers';
 import { ChoreographyElement } from './../models/ChoreographyElement';
 import { StructuredChoreography } from './../models/StructuredChoreography';
 
@@ -64,32 +65,32 @@ export class ChoreographyPreprocessor {
 
   private static selectNextElements(
     flowNode: FlowNode, nextElements: ChoreographyElement[], structuredChoreography: StructuredChoreography) {
-      // Outgoing edge of EndEvent is undefined
-      (flowNode.outgoing || []).forEach((outgoingEdge: SequenceFlow) => {
-        const target = outgoingEdge.targetRef;
+    // Outgoing edge of EndEvent is undefined
+    (flowNode.outgoing || []).forEach((outgoingEdge: SequenceFlow) => {
+      const target = outgoingEdge.targetRef;
 
-        if (is('bpmn:ChoreographyTask')(target)) {
-          // Case: Choreography Task - Select subsequent task
-          nextElements.push(structuredChoreography.getElementByReference(target));
-        } else if (is('bpmn:Gateway')(target)) {
-          const gateway = target as Gateway;
-          if (gateway.outgoing.length > 1) {
-            // Case: Split - Select all subsequent elements of the split
+      if (is('bpmn:ChoreographyTask')(target)) {
+        // Case: Choreography Task - Select subsequent task
+        nextElements.push(structuredChoreography.getElementByReference(target));
+      } else if (is('bpmn:Gateway')(target)) {
+        const gateway = target as Gateway;
+        if (gateway.outgoing.length > 1) {
+          // Case: Split - Select all subsequent elements of the split
+          ChoreographyPreprocessor.selectNextElements(target, nextElements, structuredChoreography);
+        } else if (gateway.outgoing.length === 1) {
+          if (is('bpmn:ExclusiveGateway')(gateway)) {
+            // Case: Exclusive Join - Select the subsequent element of an exclusive gateway
             ChoreographyPreprocessor.selectNextElements(target, nextElements, structuredChoreography);
-          } else if (gateway.outgoing.length === 1) {
-            if (is('bpmn:ExclusiveGateway')(gateway)) {
-              // Case: Exclusive Join - Select the subsequent element of an exclusive gateway
-              ChoreographyPreprocessor.selectNextElements(target, nextElements, structuredChoreography);
-            } else if (is('bpmn:ParallelGateway')(gateway)) {
-              // Case: Parallel Join - Select outgoing edge of element (incoming edge of the gateway)
-              nextElements.push(structuredChoreography.getElementByReference(outgoingEdge));
-            }
+          } else if (is('bpmn:ParallelGateway')(gateway)) {
+            // Case: Parallel Join - Select outgoing edge of element (incoming edge of the gateway)
+            nextElements.push(structuredChoreography.getElementByReference(outgoingEdge));
           }
-        } else if (is('bpmn:EndEvent')(target)) {
-          // Case: End Event
-          nextElements.push(structuredChoreography.getElementByReference(target));
         }
-      });
+      } else if (is('bpmn:EndEvent')(target)) {
+        // Case: End Event
+        nextElements.push(structuredChoreography.getElementByReference(target));
+      }
+    });
   }
 
   private static selectPreviousElements(
@@ -101,22 +102,34 @@ export class ChoreographyPreprocessor {
       flowNode.incoming.forEach((incomingEdge: SequenceFlow) => {
         const source = incomingEdge.sourceRef;
 
-        if (is('bpmn:ExclusiveGateway')(source)
-          && (source as ExclusiveGateway).outgoing.length !== 1) {
+        if (is('bpmn:ExclusiveGateway')(source)) {
+          if ((source as ExclusiveGateway).outgoing.length !== 1) {
             // Case: Exclusive Split - Select all subsequent elements of the gateway
             ChoreographyPreprocessor.selectNextElements(
               source,
               previousElements,
               structuredChoreography,
             );
+          } else {
+            const edgeToExclusiveSplit = source.incoming
+              .find((incoming) => is('bpmn:ExclusiveGateway')(incoming.sourceRef) &&
+                ((incoming.sourceRef as ExclusiveGateway).outgoing.length !== 1));
+            if (!isNullOrUndefined(edgeToExclusiveSplit)) {
+              ChoreographyPreprocessor.selectNextElements(
+                edgeToExclusiveSplit.sourceRef,
+                previousElements,
+                structuredChoreography,
+              );
+            }
+          }
         }
       });
     } else if (is('bpmn:ParallelGateway')(flowNode)
       && (flowNode as ParallelGateway).outgoing.length === 1) {
-        // Case: Parallel Join - Select all incoming edges
-        flowNode.incoming.forEach((incomingEdge: SequenceFlow) => {
-          previousElements.push(structuredChoreography.getElementByReference(incomingEdge));
-        });
+      // Case: Parallel Join - Select all incoming edges
+      flowNode.incoming.forEach((incomingEdge: SequenceFlow) => {
+        previousElements.push(structuredChoreography.getElementByReference(incomingEdge));
+      });
     }
   }
 }

@@ -34,13 +34,13 @@ export class ContractGenerator {
   }
 
   public static generateFiCode(choreographies: StructuredChoreography[]): FiCodeMetaData[] {
-    const fiSources = choreographies.map((choreography: StructuredChoreography): FiCodeMetaData =>  {
+    const fiSources = choreographies.map((choreography: StructuredChoreography): FiCodeMetaData => {
       const elements = choreography.getElements();
       const tasks = choreography.getChoreographyTasks();
       const joins = choreography.getAndJoinGateways();
 
       // generate storage
-      const {storage, taskNames} = ContractGenerator.generateStorage(tasks, joins);
+      const { storage, taskNames } = ContractGenerator.generateStorage(tasks, joins);
 
       // generate entries
       const initEntry = ContractGenerator.generateInitEntry(elements);
@@ -65,7 +65,7 @@ export class ContractGenerator {
     const entryPoint = 'entry init() {\n  assert(storage.initialized == bool false);\n';
 
     const startEvent = elements
-        .filter((element: ChoreographyElement) => is('bpmn:StartEvent')(element.getElement()));
+      .filter((element: ChoreographyElement) => is('bpmn:StartEvent')(element.getElement()));
 
     const activateInitialElements = startEvent
       .map((element: ChoreographyElement) => element
@@ -93,7 +93,7 @@ export class ContractGenerator {
   }
 
   private static generateStorage(
-    tasks: ChoreographyElement[], joins: ChoreographyElement[]): {storage: string, taskNames: string[]} {
+    tasks: ChoreographyElement[], joins: ChoreographyElement[]): { storage: string, taskNames: string[] } {
     const taskNames = [];
     const taskStates = tasks.map((task: ChoreographyElement) => {
       taskNames.push(task.id);
@@ -101,12 +101,12 @@ export class ContractGenerator {
     }).join('');
 
     const joinStates = joins.map((join: ChoreographyElement) =>
-          join.getPreviousElements()
-            .filter((element: ChoreographyElement) =>
-              is('bpmn:SequenceFlow')(element.getElement()))
-            .map((element: ChoreographyElement) =>
-              `storage bool ${element.id}_active;\n`,
-            ).join('')).join('');
+      join.getPreviousElements()
+        .filter((element: ChoreographyElement) =>
+          is('bpmn:SequenceFlow')(element.getElement()))
+        .map((element: ChoreographyElement) =>
+          `storage bool ${element.id}_active;\n`,
+        ).join('')).join('');
 
     return {
       storage: (taskStates + joinStates + 'storage bool initialized;\nstorage bool finished;\n\n'),
@@ -115,16 +115,16 @@ export class ContractGenerator {
   }
 
   private static generateTaskEntry(task: ChoreographyElement, joins: ChoreographyElement[]): string {
-      const entryPoint = `entry ${task.id} () {\n`;
+    const entryPoint = `entry ${task.id} () {\n`;
 
-      const controlFlowCheck = `  assert (storage.${task.id}_active);\n`;
+    const controlFlowCheck = `  assert (storage.${task.id}_active);\n`;
 
-      const controlFlowActions = ContractGenerator.generateControlFlowActions(task, joins);
+    const controlFlowActions = ContractGenerator.generateControlFlowActions(task, joins);
 
-      return entryPoint +
-        controlFlowCheck +
-        controlFlowActions +
-        '}\n\n';
+    return entryPoint +
+      controlFlowCheck +
+      controlFlowActions +
+      '}\n\n';
   }
 
   private static generateParallelJoin(join: ChoreographyElement, joins: ChoreographyElement[]): string {
@@ -144,33 +144,33 @@ export class ContractGenerator {
     choreographyElement: ChoreographyElement,
     joins: ChoreographyElement[]): string {
     const deactivatePreviousElements = choreographyElement
-    .getPreviousElements()
-    .map((element: ChoreographyElement) => `  storage.${element.id}_active = bool false;\n`)
-    .join('');
+      .getPreviousElements()
+      .map((element: ChoreographyElement) => `  storage.${element.id}_active = bool false;\n`)
+      .join('');
 
     const activateNextElements = choreographyElement
-    .getNextElements()
-    .filter((element: ChoreographyElement) => !is('bpmn:EndEvent')(element.getElement()))
-    .map((element: ChoreographyElement) => `  storage.${element.id}_active = bool true;\n`)
-    .join('');
+      .getNextElements()
+      .filter((element: ChoreographyElement) => !is('bpmn:EndEvent')(element.getElement()))
+      .map((element: ChoreographyElement) => `  storage.${element.id}_active = bool true;\n`)
+      .join('');
 
     const finishedFlag = choreographyElement
-    .getNextElements()
-    .find((element: ChoreographyElement) => is('bpmn:EndEvent')(element.getElement())) !== undefined
+      .getNextElements()
+      .find((element: ChoreographyElement) => is('bpmn:EndEvent')(element.getElement())) !== undefined
       ? '  storage.finished = bool true;\n'
       : '';
 
     // try to execute subsequent parallel joins
     const subsequentParallelJoins = choreographyElement
-    .getNextElements()
-    .filter((element: ChoreographyElement) => is('bpmn:SequenceFlow')(element.getElement()))
-    .map((element: ChoreographyElement) => (element.getElement() as SequenceFlow).targetRef)
-    .filter((flowNode: FlowNode) =>
-      is('bpmn:ParallelGateway')(flowNode) && (flowNode as ParallelGateway).outgoing.length === 1)
-    .map((parallelJoin: FlowNode) =>
-      ContractGenerator
-        .generateParallelJoin(joins.find((join: ChoreographyElement) => join.id === parallelJoin.id), joins))
-    .join('');
+      .getNextElements()
+      .filter((element: ChoreographyElement) => is('bpmn:SequenceFlow')(element.getElement()))
+      .map((element: ChoreographyElement) => (element.getElement() as SequenceFlow).targetRef)
+      .filter((flowNode: FlowNode) =>
+        is('bpmn:ParallelGateway')(flowNode) && (flowNode as ParallelGateway).outgoing.length === 1)
+      .map((parallelJoin: FlowNode) =>
+        ContractGenerator
+          .generateParallelJoin(joins.find((join: ChoreographyElement) => join.id === parallelJoin.id), joins))
+      .join('');
 
     return deactivatePreviousElements +
       activateNextElements +
