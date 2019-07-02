@@ -1,6 +1,8 @@
-import { FlowNode, ParallelGateway, SequenceFlow } from 'bpmn-moddle';
+import { ChoreographyActivity, FlowNode, ParallelGateway, SequenceFlow } from 'bpmn-moddle';
 import fi from 'fi-compiler';
+import { isUndefined } from 'util';
 import { is } from '../helper/helpers';
+import { RoleMapping } from '../models/RoleMapping';
 import { ChoreographyElement } from './../models/ChoreographyElement';
 import { Contract } from './../models/Contract';
 import { StructuredChoreography } from './../models/StructuredChoreography';
@@ -14,15 +16,15 @@ interface FiCodeMetaData {
 
 export class ContractGenerator {
 
-  public static async generateContractsFromBPMN(xml: string): Promise<Contract[]> {
+  public static async generateContractsFromBPMN(xml: string, roleMappings: RoleMapping[]): Promise<Contract[]> {
     const structuredChoreographies = await ChoreographyPreprocessor.parseXml(xml);
     const definitions = ChoreographyPreprocessor.processDefinitions(structuredChoreographies);
-    const code = ContractGenerator.generateContracts(definitions);
+    const code = ContractGenerator.generateContracts(definitions, roleMappings);
     return code;
   }
 
-  public static generateContracts(choreographies: StructuredChoreography[]): Contract[] {
-    const fiCode = ContractGenerator.generateFiCode(choreographies);
+  public static generateContracts(choreographies: StructuredChoreography[], roleMappings: RoleMapping[]): Contract[] {
+    const fiCode = ContractGenerator.generateFiCode(choreographies, roleMappings);
     return ContractGenerator.compileFiCode(fiCode);
   }
 
@@ -33,7 +35,8 @@ export class ContractGenerator {
     });
   }
 
-  public static generateFiCode(choreographies: StructuredChoreography[]): FiCodeMetaData[] {
+  public static generateFiCode(
+    choreographies: StructuredChoreography[], roleMappings: RoleMapping[]): FiCodeMetaData[] {
     const fiSources = choreographies.map((choreography: StructuredChoreography): FiCodeMetaData => {
       const elements = choreography.getElements();
       const tasks = choreography.getChoreographyTasks();
@@ -46,7 +49,7 @@ export class ContractGenerator {
       const initEntry = ContractGenerator.generateInitEntry(elements);
 
       const taskEntries = tasks
-        .map((task: ChoreographyElement): string => ContractGenerator.generateTaskEntry(task, joins))
+        .map((task: ChoreographyElement): string => ContractGenerator.generateTaskEntry(task, joins, roleMappings))
         .join('');
 
       // generate initial state
@@ -114,14 +117,27 @@ export class ContractGenerator {
     };
   }
 
-  private static generateTaskEntry(task: ChoreographyElement, joins: ChoreographyElement[]): string {
+  private static generateTaskEntry(
+    task: ChoreographyElement, joins: ChoreographyElement[], roleMappings: RoleMapping[]): string {
     const entryPoint = `entry ${task.id} () {\n`;
+
+    const initiator = (task.getElement() as ChoreographyActivity).initiatingParticipantRef.id;
+    const mapping = roleMappings.find((map: RoleMapping) => map.roleId === initiator);
+
+    // Warning: Unsecured task execution may be possible. An error should be thrown instead of not having the check!
+    const initiatorCheck = isUndefined(mapping)
+      ? () => {
+        console.warn(`Waring! Task ${task.id} is unsecured! Please provide a valid role mapping.`);
+        return '';
+      }
+      : `  assert (SENDER == address "${mapping.address}");\n`;
 
     const controlFlowCheck = `  assert (storage.${task.id}_active);\n`;
 
     const controlFlowActions = ContractGenerator.generateControlFlowActions(task, joins);
 
     return entryPoint +
+      initiatorCheck +
       controlFlowCheck +
       controlFlowActions +
       '}\n\n';

@@ -1,11 +1,6 @@
 export interface RoleMapping {
-    role: string;
+    roleId: string;
     address: string;
-}
-
-export interface ChoreographyMappings {
-    id: string;
-    mappings: RoleMapping[];
 }
 
 export interface XMLWithRoleMapping {
@@ -17,10 +12,7 @@ export interface XMLWithRoleMapping {
 export interface XMLWithRole {
     xml: string;
     task: string[];
-    role: string;
+    address: string;
     id: string;
-}
-
-export function getMappingsForChoreography(mappings: ChoreographyMappings[], id: string): RoleMapping[] {
-    return mappings.find((map) => map.id === id).mappings;
+    mappings: RoleMapping[];
 }

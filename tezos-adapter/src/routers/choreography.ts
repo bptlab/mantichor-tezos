@@ -1,19 +1,17 @@
 import { Router } from 'express';
+import { isNullOrUndefined } from 'util';
 import * as connector from '../connector';
 import { deployChoreography, executeFunction, getActiveTasks } from '../connector/ContractHelper';
+import { getAccountForAddress } from '../models/Account';
 import {
-  ChoreographyMappings, getMappingsForChoreography,
   XMLWithRole, XMLWithRoleMapping,
 } from '../models/RoleMapping';
 
 const router = Router();
 
-const choreographyRoleMappings: ChoreographyMappings[] = [];
-
 router.post('/choreographies', async (request, response) => {
   const { xml, id, mappings }: XMLWithRoleMapping = request.body;
-  choreographyRoleMappings.push({ mappings, id });
-  const address = await deployChoreography(xml, connector.getDefaultAccount());
+  const address = await deployChoreography(xml, connector.getDefaultAccount(), mappings);
   response.send({
     address,
   });
@@ -21,11 +19,11 @@ router.post('/choreographies', async (request, response) => {
 
 router.post('/choreographies/:choreographyId/tasks/execute', async (request, response) => {
   const { choreographyId } = request.params;
-  const { task, xml, id, role }: XMLWithRole = request.body;
-  const mappings = getMappingsForChoreography(choreographyRoleMappings, id);
-  const account = connector.getAccount(role, mappings);
-  // TODO: Implement task hierarchy
-  if (await executeFunction(xml, choreographyId, await account, task[0])) {
+  const { task, xml, id, address, mappings }: XMLWithRole = request.body;
+  const account = getAccountForAddress(address);
+  if (isNullOrUndefined(account)) {
+    response.sendStatus(401);
+  } else if (await executeFunction(xml, choreographyId, account, task[0], mappings)) {
     response.sendStatus(200);
   } else {
     response.sendStatus(500);
@@ -35,8 +33,8 @@ router.post('/choreographies/:choreographyId/tasks/execute', async (request, res
 router.post('/choreographies/:choreographyId/tasks', async (request, response) => {
   const { choreographyId } = request.params;
   const { enabled } = request.query;
-  const { xml } = request.body;
-  const tasks = await getActiveTasks(xml, choreographyId);
+  const { xml, mappings } = request.body;
+  const tasks = await getActiveTasks(xml, choreographyId, mappings);
   response.send({ tasks });
 });
 

@@ -1,22 +1,23 @@
 import { callContractFunction, deployContract, getContractStorage } from '.';
+import { RoleMapping } from '../models/RoleMapping';
 import { Account } from './../models/Account';
 import { ContractGenerator } from './../translator/ContractGenerator';
 
 // Currently we assume only one choreography per contract
 
-export async function deployChoreography(xml: string, account: Account): Promise<string> {
-  const contract = (await ContractGenerator.generateContractsFromBPMN(xml))[0];
+export async function deployChoreography(xml: string, account: Account, roleMappings: RoleMapping[]): Promise<string> {
+  const contract = (await ContractGenerator.generateContractsFromBPMN(xml, roleMappings))[0];
   return await deployContract(contract, account.identifier);
 }
 
 export async function executeFunction(
-  xml: string, address: string, account: Account, functionName: string): Promise<boolean> {
-  const contract = (await ContractGenerator.generateContractsFromBPMN(xml))[0];
+  xml: string, address: string, account: Account, functionName: string, roleMappings: RoleMapping[]): Promise<boolean> {
+  const contract = (await ContractGenerator.generateContractsFromBPMN(xml, roleMappings))[0];
   return callContractFunction(contract, address, account.identifier, functionName);
 }
 
-export async function getActiveTasks(xml: string, address: string): Promise<string[][]> {
-  const contract = (await ContractGenerator.generateContractsFromBPMN(xml))[0];
+export async function getActiveTasks(xml: string, address: string, roleMappings: RoleMapping[]): Promise<string[][]> {
+  const contract = (await ContractGenerator.generateContractsFromBPMN(xml, roleMappings))[0];
   const storage = await getContractStorage(address);
   const regex = /(true|false)/gi;
   const states = [];

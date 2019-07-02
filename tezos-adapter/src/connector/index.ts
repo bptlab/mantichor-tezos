@@ -12,8 +12,8 @@ const tezosAddress = '127.0.0.1';
 const tezosPort = '18731';
 const tezosBaseDir = '/var/run/tezos/client';
 
-export function getAccount(role: string, choreographyMappings: RoleMapping[]): Account {
-  return getAccountForRoleWithMapping(role, choreographyMappings);
+export function getAccount(address: string, choreographyMappings: RoleMapping[]): Account {
+  return getAccountForRoleWithMapping(address, choreographyMappings);
 }
 
 export function getDefaultAccount(): Account {
