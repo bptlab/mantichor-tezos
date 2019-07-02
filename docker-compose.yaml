@@ -15,7 +15,6 @@ services:
     expose:
       - "18731"
       - "7320"
-    network_mode: host
     volumes:
       - node_data:/var/run/tezos/node
       - client_data:/var/run/tezos/client
