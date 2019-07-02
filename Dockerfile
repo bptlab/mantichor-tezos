@@ -4,7 +4,7 @@ FROM ubuntu:18.04
 
 # Install compilation dependencies
 RUN apt-get update -y && \
- apt-get install -y rsync git m4 build-essential patch unzip bubblewrap wget pkg-config libgmp-dev libev-dev libhidapi-dev libsodium-dev libcurl4-gnutls-dev ocaml libsystemd-dev libudev-dev perl curl libusb-1.0-0-dev nodejs gcc g++ make
+ apt-get install -y rsync git m4 build-essential patch unzip bubblewrap wget pkg-config libgmp-dev libev-dev libhidapi-dev libsodium-dev libcurl4-gnutls-dev ocaml libsystemd-dev libudev-dev perl curl libusb-1.0-0-dev nodejs npm gcc g++ make
 
 # Install Opam
 RUN wget https://github.com/ocaml/opam/releases/download/2.0.3/opam-2.0.3-x86_64-linux && \
