@@ -20,8 +20,9 @@ export function getAccountForIdentifier(identifier: string): Account {
 // can also use the identity to find the corresponding acount, depending on our implementation
 export function getAccountForRoleWithMapping(role: string, mappings: RoleMapping[]): Account {
     const mapping = mappings.find((map) => map.role === role);
-    const account = getAccountForIdentifier(mapping.identifier);
+    const account = getAccountForIdentity(mapping.address);
     if (isNullOrUndefined(account)) {
+        console.log('Falling back to bootstrap2, should return error instead!'); // TODO: return error
         return bootstrap2;
     } else {
         return account;

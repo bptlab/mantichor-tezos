@@ -1,6 +1,6 @@
 export interface RoleMapping {
     role: string;
-    identifier: string;
+    address: string;
 }
 
 export interface ChoreographyMappings {
