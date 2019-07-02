@@ -16,7 +16,7 @@ export interface XMLWithRoleMapping {
 
 export interface XMLWithRole {
     xml: string;
-    tasks: string[];
+    task: string[];
     role: string;
     id: string;
 }
