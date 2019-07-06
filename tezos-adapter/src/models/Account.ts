@@ -1,6 +1,5 @@
 import { isNullOrUndefined } from 'util';
-import { accounts, bootstrap2 } from '../connector/accounts';
-import { RoleMapping } from './RoleMapping';
+import { accounts } from '../connector/accounts';
 
 export interface Account {
     identifier: string;
@@ -11,20 +10,10 @@ export interface Account {
 
 // TODO: Refactor to potentially read account from config file only
 export function getAccountForAddress(address: string): Account {
-    return accounts.find((account) => account.address === address);
-}
-
-export function getAccountForIdentifier(identifier: string): Account {
-    return accounts.find((account) => account.identifier === identifier);
-}
-
-// can also use the identity to find the corresponding acount, depending on our implementation
-export function getAccountForRoleWithMapping(address: string, mappings: RoleMapping[]): Account {
-    const mapping = mappings.find((map) => map.roleId === address);
-    const account = getAccountForAddress(mapping.address);
+    // if flag is set, try to read from file, else look in stored accounts
+    const account = accounts.find((acc) => acc.address === address);
     if (isNullOrUndefined(account)) {
-        console.log('Falling back to bootstrap2, should return error instead!'); // TODO: return error
-        return bootstrap2;
+        throw new Error(`No account found for address ${address}!`);
     } else {
         return account;
     }

@@ -2,8 +2,6 @@ import { exec } from 'child_process';
 import fi from 'fi-compiler';
 import * as fs from 'fs';
 
-import { getAccountForIdentifier, getAccountForRoleWithMapping } from '../models/Account';
-import { RoleMapping } from '../models/RoleMapping';
 import { Account } from './../models/Account';
 import { Contract } from './../models/Contract';
 import { bootstrap1 } from './accounts';
@@ -11,10 +9,6 @@ import { bootstrap1 } from './accounts';
 const tezosAddress = '127.0.0.1';
 const tezosPort = '18731';
 const tezosBaseDir = '/var/run/tezos/client';
-
-export function getAccount(address: string, choreographyMappings: RoleMapping[]): Account {
-  return getAccountForRoleWithMapping(address, choreographyMappings);
-}
 
 export function getDefaultAccount(): Account {
   return bootstrap1;
