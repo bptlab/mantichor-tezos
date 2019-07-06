@@ -126,11 +126,12 @@ export class ContractGenerator {
 
     // Warning: Unsecured task execution may be possible. An error should be thrown instead of not having the check!
     const initiatorCheck = isUndefined(mapping)
-      ? () => {
-        console.warn(`Waring! Task ${task.id} is unsecured! Please provide a valid role mapping.`);
-        return '';
-      }
+      ? ''
       : `  assert (SENDER == address "${mapping.address}");\n`;
+
+    if (isUndefined(mapping)) {
+      console.warn(`Warning! Task ${task.id} is unsecured! Please provide a valid role mapping.`);
+    }
 
     const controlFlowCheck = `  assert (storage.${task.id}_active);\n`;
 

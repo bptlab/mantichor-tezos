@@ -86,3 +86,10 @@ export async function callContractFunction(
   console.info(`Executed function ${functionName} successfully`);
   return true;
 }
+
+// Definitely not going to work in the sandboxed mode
+export async function activateAlphanetAccount(path: string, accountName: string): Promise<boolean> {
+  const command = `activate account ${accountName} with "${path}"`;
+  const result = await executeCommand(command);
+  return true;
+}

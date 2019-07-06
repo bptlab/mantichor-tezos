@@ -20,8 +20,9 @@ router.post('/choreographies', async (request, response) => {
 router.post('/choreographies/:choreographyId/tasks/execute', async (request, response) => {
   const { choreographyId } = request.params;
   const { task, xml, id, address, mappings }: XMLWithRole = request.body;
-  const account = getAccountForAddress(address);
+  const account = await getAccountForAddress(address);
   if (isNullOrUndefined(account)) {
+    console.info(`No account found for addres ${address}!`);
     response.sendStatus(401);
   } else if (await executeFunction(xml, choreographyId, account, task[0], mappings)) {
     response.sendStatus(200);
