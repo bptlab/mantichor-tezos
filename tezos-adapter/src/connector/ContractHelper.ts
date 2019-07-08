@@ -11,13 +11,13 @@ export async function deployChoreography(xml: string, account: Account, roleMapp
 }
 
 export async function executeFunction(
-  xml: string, address: string, account: Account, functionName: string, roleMappings: RoleMapping[]): Promise<boolean> {
-  const contract = (await ContractGenerator.generateContractsFromBPMN(xml, roleMappings))[0];
+  xml: string, address: string, account: Account, functionName: string): Promise<boolean> {
+  const contract = (await ContractGenerator.generateContractsFromBPMN(xml))[0];
   return callContractFunction(contract, address, account.identifier, functionName);
 }
 
-export async function getActiveTasks(xml: string, address: string, roleMappings: RoleMapping[]): Promise<string[][]> {
-  const contract = (await ContractGenerator.generateContractsFromBPMN(xml, roleMappings))[0];
+export async function getActiveTasks(xml: string, address: string): Promise<string[][]> {
+  const contract = (await ContractGenerator.generateContractsFromBPMN(xml))[0];
   const storage = await getContractStorage(address);
   const regex = /(true|false)/gi;
   const states = [];

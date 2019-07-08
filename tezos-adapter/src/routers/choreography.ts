@@ -19,12 +19,12 @@ router.post('/choreographies', async (request, response) => {
 
 router.post('/choreographies/:choreographyId/tasks/execute', async (request, response) => {
   const { choreographyId } = request.params;
-  const { task, xml, id, address, mappings }: XMLWithRole = request.body;
+  const { task, xml, address }: XMLWithRole = request.body;
   const account = await getAccountForAddress(address);
   if (isNullOrUndefined(account)) {
     console.info(`No account found for address ${address}!`);
     response.sendStatus(401);
-  } else if (await executeFunction(xml, choreographyId, account, task[0], mappings)) {
+  } else if (await executeFunction(xml, choreographyId, account, task[0])) {
     response.sendStatus(200);
   } else {
     response.sendStatus(500);
@@ -34,8 +34,8 @@ router.post('/choreographies/:choreographyId/tasks/execute', async (request, res
 router.post('/choreographies/:choreographyId/tasks', async (request, response) => {
   const { choreographyId } = request.params;
   const { enabled } = request.query;
-  const { xml, mappings } = request.body;
-  const tasks = await getActiveTasks(xml, choreographyId, mappings);
+  const { xml } = request.body;
+  const tasks = await getActiveTasks(xml, choreographyId);
   response.send({ tasks });
 });
 

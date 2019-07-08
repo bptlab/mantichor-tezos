@@ -16,9 +16,14 @@ interface FiCodeMetaData {
 
 export class ContractGenerator {
 
-  public static async generateContractsFromBPMN(xml: string, roleMappings: RoleMapping[]): Promise<Contract[]> {
+  public static async generateContractsFromBPMN(xml: string, roleMappings: RoleMapping[] = []): Promise<Contract[]> {
     const structuredChoreographies = await ChoreographyPreprocessor.parseXml(xml);
     const definitions = ChoreographyPreprocessor.processDefinitions(structuredChoreographies);
+    if (roleMappings.length === 0) {
+      console.warn(
+        'Warning: No role mapping is provided. The contract will be generated without execution permissions.',
+      );
+    }
     const code = ContractGenerator.generateContracts(definitions, roleMappings);
     return code;
   }
