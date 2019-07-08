@@ -35,4 +35,4 @@ export const bootstrap5: Account = {
     secretKey: 'edsk4QLrcijEffxV31gGdN2HU7UpyJjA8drFoNcmnB28n89YjPNRFm',
 };
 
-export const accounts = [bootstrap1, bootstrap2, bootstrap3, bootstrap3, bootstrap4, bootstrap5];
+export const accounts = [bootstrap2, bootstrap3, bootstrap4, bootstrap5];

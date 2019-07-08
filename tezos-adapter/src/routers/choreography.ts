@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { isNullOrUndefined } from 'util';
 import * as connector from '../connector';
 import { deployChoreography, executeFunction, getActiveTasks } from '../connector/ContractHelper';
-import { getAccountForAddress } from '../models/Account';
+import { getAccountForAddress, getBootstrapAccounts } from '../models/Account';
 import {
   XMLWithRole, XMLWithRoleMapping,
 } from '../models/RoleMapping';
@@ -37,6 +37,13 @@ router.post('/choreographies/:choreographyId/tasks', async (request, response) =
   const { xml, mappings } = request.body;
   const tasks = await getActiveTasks(xml, choreographyId, mappings);
   response.send({ tasks });
+});
+
+router.get('/accounts', async (request, response) => {
+  // TODO: only get bootstrap accounts in sandboxed mode
+  const accounts = getBootstrapAccounts();
+  const accountAddresses = accounts.map((acc) => acc.address);
+  response.send({ accounts: accountAddresses });
 });
 
 export default router;

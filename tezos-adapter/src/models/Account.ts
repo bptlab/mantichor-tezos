@@ -47,3 +47,7 @@ export async function getAccountForAddress(address: string): Promise<Account> {
         ? await readAccountFromFile(address)
         : accounts.find((acc) => acc.address === address);
 }
+
+export function getBootstrapAccounts(): Account[] {
+    return accounts;
+}
