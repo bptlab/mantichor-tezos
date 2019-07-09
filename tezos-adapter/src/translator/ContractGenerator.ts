@@ -123,7 +123,7 @@ export class ContractGenerator {
   }
 
   private static generateTaskEntry(
-    task: ChoreographyElement, joins: ChoreographyElement[], roleMappings: RoleMapping[]): string {
+    task: ChoreographyElement, joins: ChoreographyElement[], roleMappings: RoleMapping[] = []): string {
     const entryPoint = `entry ${task.id} () {\n`;
 
     const initiator = (task.getElement() as ChoreographyActivity).initiatingParticipantRef.id;

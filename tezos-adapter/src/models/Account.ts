@@ -11,7 +11,7 @@ export interface Account {
     address: string;
 }
 
-export interface AccountJSON {
+interface AccountJSON {
     mnemonic: string[];
     secret: string;
     amount: string;
