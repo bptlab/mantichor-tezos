@@ -1,11 +1,12 @@
 import { callContractFunction, deployContract, getContractStorage } from '.';
+import { RoleMapping } from '../models/RoleMapping';
 import { Account } from './../models/Account';
 import { ContractGenerator } from './../translator/ContractGenerator';
 
 // Currently we assume only one choreography per contract
 
-export async function deployChoreography(xml: string, account: Account): Promise<string> {
-  const contract = (await ContractGenerator.generateContractsFromBPMN(xml))[0];
+export async function deployChoreography(xml: string, account: Account, roleMappings: RoleMapping[]): Promise<string> {
+  const contract = (await ContractGenerator.generateContractsFromBPMN(xml, roleMappings))[0];
   return await deployContract(contract, account.identifier);
 }
 

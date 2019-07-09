@@ -40,6 +40,7 @@ cd /adapter || exit 1
 npm run serve &
 
 # Bake in a loop every 20 seconds, since sandbox does not come with a baker node
+# Apparently, it suffices to bake for the bootstrap1 account, even when triggering transactions with others. 
 while :
 do
     echo "-> baking for bootstrap1 account"

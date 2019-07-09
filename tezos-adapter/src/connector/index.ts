@@ -4,32 +4,14 @@ import * as fs from 'fs';
 
 import { Account } from './../models/Account';
 import { Contract } from './../models/Contract';
-
-const bootstrapKey = 'edsk3gUfUPyBSfrS9CCgmCiQsTCHGkviBDusMxDJstFtojtc1zcpsh';
-const bootstrapIdentity = 'tz1KqTpEZ7Yob7QbPE4Hy4Wo8fHG8LhKxZSx';
-const bootstrapPubkey = 'edpkuBknW28nW72KG6RoHtYW7p12T6GKc7nAbwYX5m8Wd9sDVC9yav';
-
-// const testIdentity = 'tz1gjaF81ZRRvdzjobyfVNsAeSC6PScjfQwN';
-// const testPubkey = 'edpktzNbDAUjUk697W7gYg2CRuBQjyPxbEg8dLccYYwKSKvkPvjtV9';
+import { bootstrap1 } from './accounts';
 
 const tezosAddress = '127.0.0.1';
 const tezosPort = '18731';
 const tezosBaseDir = '/var/run/tezos/client';
 
-// TODO: originate account for this adapter
-
-/* TODO: hardcode mapping from client to pair of {secretkey, identity, publickey}, since
-the tezos sandbox is unable to handle new accounts. -> https://gitlab.com/tezos/tezos/issues/346
-Therefore, we have to create a mapping from possible clients
-to bootstrapped tezos accounts. */
-export async function createAccount(): Promise<Account> {
-  const account: Account = {
-    identifier: 'bootstrap1',
-    identity: bootstrapIdentity,
-    publicKey: bootstrapPubkey,
-    secretKey: bootstrapKey,
-  };
-  return account;
+export function getDefaultAccount(): Account {
+  return bootstrap1;
 }
 
 async function executeCommand(command: string): Promise<string> {
@@ -102,5 +84,12 @@ export async function callContractFunction(
     return false;
   }
   console.info(`Executed function ${functionName} successfully`);
+  return true;
+}
+
+// Definitely not going to work in the sandboxed mode
+export async function activateAlphanetAccount(path: string, accountName: string): Promise<boolean> {
+  const command = `activate account ${accountName} with "${path}"`;
+  const result = await executeCommand(command);
   return true;
 }
