@@ -8,6 +8,8 @@ import {
   ParallelGateway,
   RootElement,
   SequenceFlow,
+  StartEvent,
+  SubChoreography,
 } from 'bpmn-moddle';
 import { isNullOrUndefined } from 'util';
 import { is, parseModdle } from '../helper/helpers';
@@ -36,9 +38,30 @@ export class ChoreographyPreprocessor {
 
     const structuredChoreographies = choreographies.map((choreography: Choreography): StructuredChoreography => {
       const structuredChoreography = new StructuredChoreography(choreography.flowElements
-        .filter((element) =>
-          is('bpmn:ChoreographyTask', 'bpmn:Gateway', 'bpmn:SequenceFlow', 'bpmn:StartEvent', 'bpmn:EndEvent')(element))
+        .filter(is(
+          'bpmn:ChoreographyTask',
+          'bpmn:SubChoreography',
+          'bpmn:Gateway',
+          'bpmn:SequenceFlow',
+          'bpmn:StartEvent',
+          'bpmn:EndEvent'))
         .map((element: FlowElement) => new ChoreographyElement(element)));
+
+      // Add a selection of sub choreography flow elements
+      structuredChoreography.addElements(structuredChoreography
+          .getElements()
+          .filter((choreographyElement: ChoreographyElement) =>
+            is('bpmn:SubChoreography')(choreographyElement.getElement()))
+          .reduce((structuredChoreographyElements, choreographyElement: ChoreographyElement) =>
+            structuredChoreographyElements
+              .concat((choreographyElement.getElement() as SubChoreography).flowElements
+                .filter(is(
+                  'bpmn:ChoreographyTask',
+                  'bpmn:SubChoreography',
+                  'bpmn:Gateway',
+                  'bpmn:SequenceFlow'))
+                .map((element: FlowElement) =>
+                  new ChoreographyElement(element, choreographyElement.getElement()))), []));
 
       structuredChoreography
         .getElements()
@@ -58,6 +81,7 @@ export class ChoreographyPreprocessor {
 
           element.eliminateDuplicates();
         });
+      console.info(structuredChoreography);
       return structuredChoreography;
     });
     return structuredChoreographies;
@@ -68,10 +92,19 @@ export class ChoreographyPreprocessor {
     // Outgoing edge of EndEvent is undefined
     (flowNode.outgoing || []).forEach((outgoingEdge: SequenceFlow) => {
       const target = outgoingEdge.targetRef;
+      console.info('Target', target.name);
 
       if (is('bpmn:ChoreographyTask')(target)) {
         // Case: Choreography Task - Select subsequent task
         nextElements.push(structuredChoreography.getElementByReference(target));
+      } else if (is('bpmn:SubChoreography')(target)) {
+        const subChor = target as SubChoreography;
+        const subStart = subChor.flowElements
+          .filter((subElement: FlowElement) => is('bpmn:StartEvent')(subElement))[0] as StartEvent;
+        subStart.outgoing.forEach((subSequenceFlow: SequenceFlow) => {
+          nextElements.push(structuredChoreography.getElementByReference(subSequenceFlow.targetRef));
+        });
+        // nextElements.push(structuredChoreography.getElementByReference())
       } else if (is('bpmn:Gateway')(target)) {
         const gateway = target as Gateway;
         if (gateway.outgoing.length > 1) {
@@ -87,8 +120,18 @@ export class ChoreographyPreprocessor {
           }
         }
       } else if (is('bpmn:EndEvent')(target)) {
-        // Case: End Event
-        nextElements.push(structuredChoreography.getElementByReference(target));
+        const parentElement = structuredChoreography.getElementByReference(flowNode).getParent();
+        if (parentElement != null) {
+          if (is('bpmn:SubChoreography')(parentElement)) {
+            const parentSubChoreo = parentElement as SubChoreography;
+            parentSubChoreo.outgoing.forEach((parentOutgoingElement: SequenceFlow) => {
+              nextElements.push(structuredChoreography.getElementByReference(parentOutgoingElement.targetRef));
+            });
+          }
+        } else {
+          // Case: End Event
+          nextElements.push(structuredChoreography.getElementByReference(target));
+        }
       }
     });
   }

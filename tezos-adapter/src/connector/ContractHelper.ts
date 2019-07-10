@@ -7,6 +7,7 @@ import { ContractGenerator } from './../translator/ContractGenerator';
 
 export async function deployChoreography(xml: string, account: Account, roleMappings: RoleMapping[]): Promise<string> {
   const contract = (await ContractGenerator.generateContractsFromBPMN(xml, roleMappings))[0];
+  console.info(contract.getFiCode());
   return await deployContract(contract, account.identifier);
 }
 

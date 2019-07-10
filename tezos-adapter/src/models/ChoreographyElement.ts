@@ -4,9 +4,11 @@ export class ChoreographyElement {
   private nextElements: ChoreographyElement[] = [];
   private previousElements: ChoreographyElement[] = [];
   private element: FlowElement;
+  private parent: FlowElement;
 
-  constructor(element: FlowElement) {
+  constructor(element: FlowElement, parent: FlowElement = null) {
     this.element = element;
+    this.parent = parent;
   }
 
   public eliminateDuplicates(): void {
@@ -20,6 +22,10 @@ export class ChoreographyElement {
 
   public getPreviousElements(): ChoreographyElement[] {
     return this.previousElements;
+  }
+
+  public getParent(): FlowElement {
+    return this.parent;
   }
 
   public getElement(): FlowElement {

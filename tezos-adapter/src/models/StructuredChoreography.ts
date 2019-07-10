@@ -15,12 +15,20 @@ export class StructuredChoreography {
     this.elements = elements;
   }
 
+  public addElements(choreographyElements: ChoreographyElement[]): void {
+    this.elements = this.elements.concat(choreographyElements);
+  }
+
   public getElements(): ChoreographyElement[] {
     return this.elements;
   }
 
   public getChoreographyTasks(): ChoreographyElement[] {
     return this.elements.filter((element: ChoreographyElement) => is('bpmn:ChoreographyTask')(element.getElement()));
+  }
+
+  public getSubChoreographies(): ChoreographyElement[] {
+    return this.elements.filter((element: ChoreographyElement) => is('bpmn:SubChoreography')(element.getElement()));
   }
 
   public getAndJoinGateways(): ChoreographyElement[] {
