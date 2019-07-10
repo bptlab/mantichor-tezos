@@ -81,7 +81,6 @@ export class ChoreographyPreprocessor {
 
           element.eliminateDuplicates();
         });
-      console.info(structuredChoreography);
       return structuredChoreography;
     });
     return structuredChoreographies;
@@ -92,7 +91,6 @@ export class ChoreographyPreprocessor {
     // Outgoing edge of EndEvent is undefined
     (flowNode.outgoing || []).forEach((outgoingEdge: SequenceFlow) => {
       const target = outgoingEdge.targetRef;
-      console.info('Target', target.name);
 
       if (is('bpmn:ChoreographyTask')(target)) {
         // Case: Choreography Task - Select subsequent task
