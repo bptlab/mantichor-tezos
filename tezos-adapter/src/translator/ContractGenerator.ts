@@ -46,9 +46,13 @@ export class ContractGenerator {
       const elements = choreography.getElements();
       const tasks = choreography.getChoreographyTasks();
       const joins = choreography.getAndJoinGateways();
+      const subChoreographies = choreography.getSubChoreographies();
 
       // generate storage
-      const { storage, taskNames } = ContractGenerator.generateStorage(tasks, joins);
+      const { storage, taskNames } = ContractGenerator.generateStorage(tasks, joins, subChoreographies);
+
+      // generate initial state
+      const initialState = ContractGenerator.generateInitialState(tasks, joins, subChoreographies);
 
       // generate entries
       const initEntry = ContractGenerator.generateInitEntry(elements);
@@ -56,9 +60,6 @@ export class ContractGenerator {
       const taskEntries = tasks
         .map((task: ChoreographyElement): string => ContractGenerator.generateTaskEntry(task, joins, roleMappings))
         .join('');
-
-      // generate initial state
-      const initialState = ContractGenerator.generateInitialState(tasks, joins);
 
       return {
         code: storage + initEntry + taskEntries,
@@ -87,8 +88,12 @@ export class ContractGenerator {
       '  storage.initialized = bool true;\n}\n\n';
   }
 
-  private static generateInitialState(tasks: ChoreographyElement[], joins: ChoreographyElement[]): string {
-    const states = tasks.length + joins.length + 2; // Initialized and finished state
+  private static generateInitialState(
+    tasks: ChoreographyElement[],
+    joins: ChoreographyElement[],
+    subChoreographies: ChoreographyElement[],
+    ): string {
+    const states = tasks.length + joins.length + subChoreographies.length + 2; // Initialized and finished state
     let result = '';
     for (let i = 1; i < states; i++) {
       result += '(Pair False ';
@@ -101,7 +106,10 @@ export class ContractGenerator {
   }
 
   private static generateStorage(
-    tasks: ChoreographyElement[], joins: ChoreographyElement[]): { storage: string, taskNames: string[] } {
+    tasks: ChoreographyElement[],
+    joins: ChoreographyElement[],
+    subChoreographies: ChoreographyElement[],
+    ): { storage: string, taskNames: string[] } {
     const taskNames = [];
     const taskStates = tasks.map((task: ChoreographyElement) => {
       taskNames.push(task.id);
@@ -116,8 +124,14 @@ export class ContractGenerator {
           `storage bool ${element.id}_active;\n`,
         ).join('')).join('');
 
+    const subChoreographyStates = subChoreographies.map((subChoreography: ChoreographyElement) =>
+      `storage bool ${subChoreography.id}_active;\n`);
+
     return {
-      storage: (taskStates + joinStates + 'storage bool initialized;\nstorage bool finished;\n\n'),
+      storage: (taskStates +
+        joinStates +
+        subChoreographyStates +
+        'storage bool initialized;\nstorage bool finished;\n\n'),
       taskNames,
     };
   }
@@ -130,15 +144,17 @@ export class ContractGenerator {
     const mapping = roleMappings.find((map: RoleMapping) => map.roleId === initiator);
 
     // Warning: Unsecured task execution may be possible. An error should be thrown instead of not having the check!
-    const initiatorCheck = isUndefined(mapping)
-      ? ''
-      : `  assert (SENDER == address "${mapping.address}");\n`;
-
     if (isUndefined(mapping)) {
       console.warn(`Warning! Task ${task.id} is unsecured! Please provide a valid role mapping.`);
     }
 
-    const controlFlowCheck = `  assert (storage.${task.id}_active);\n`;
+    const initiatorCheck = isUndefined(mapping)
+      ? ''
+      : `  assert (SENDER == address "${mapping.address}");\n`;
+
+    const controlFlowCheck = task.getParent() != null
+      ? `  assert (storage.${task.getParent().id}_active);\n  assert (storage.${task.id}_active);\n`
+      : `  assert (storage.${task.id}_active);\n`;
 
     const controlFlowActions = ContractGenerator.generateControlFlowActions(task, joins);
 
@@ -173,7 +189,17 @@ export class ContractGenerator {
     const activateNextElements = choreographyElement
       .getNextElements()
       .filter((element: ChoreographyElement) => !is('bpmn:EndEvent')(element.getElement()))
-      .map((element: ChoreographyElement) => `  storage.${element.id}_active = bool true;\n`)
+      .map((element: ChoreographyElement) => {
+        let prefix = '';
+        // Leaving a subchoreography
+        if (choreographyElement.getParent() != null && element.getParent() == null) {
+          prefix = `  storage.${choreographyElement.getParent().id}_active = bool false;\n`;
+        // Entering a subchoreography
+        } else if (choreographyElement.getParent() == null && element.getParent() != null) {
+          prefix = `  storage.${element.getParent().id}_active = bool true;\n`;
+        }
+        return `${prefix}  storage.${element.id}_active = bool true;\n`;
+      })
       .join('');
 
     const finishedFlag = choreographyElement
