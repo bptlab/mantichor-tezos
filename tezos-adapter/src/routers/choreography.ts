@@ -25,7 +25,7 @@ router.post('/choreographies/:choreographyId/tasks/execute', async (request, res
     console.info(`No account found for address ${address}!`);
     response.sendStatus(401);
   } else if (await executeFunction(xml, choreographyId, account, task[0])) {
-    response.sendStatus(200);
+    response.sendStatus(204);
   } else {
     response.sendStatus(500);
   }
