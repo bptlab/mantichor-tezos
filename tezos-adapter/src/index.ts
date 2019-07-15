@@ -3,6 +3,7 @@ import express from 'express';
 import * as request from 'request-promise-native';
 import sleep from 'sleepjs';
 import choreographyRouter from './routers/choreography';
+import cors from 'cors';
 
 const main = async () => {
   await sleep(20000);
@@ -28,6 +29,7 @@ const main = async () => {
 
   const app = express();
   app.use(bodyParser.json());
+  app.use(cors());
   app.use(choreographyRouter);
   app.listen(7320, () => console.log('Local Tezos Blockchain Adapter listening on port 7320!'));
 
