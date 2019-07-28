@@ -1,6 +1,7 @@
 # Mantichor Tezos
 
 Tezos Blockchain Choreography Converter and Backend based on the Tezos Blockchain.
+The Adapter us listening for the Mantichor Frontend on Port 7320.
 
 ## Dependencies
 
