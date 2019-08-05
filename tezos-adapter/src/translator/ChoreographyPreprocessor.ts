@@ -1,7 +1,6 @@
 import {
   Choreography,
   Definitions,
-  ExclusiveGateway,
   FlowElement,
   FlowNode,
   Gateway,
@@ -109,7 +108,7 @@ export class ChoreographyPreprocessor {
           // Case: Split - Select all subsequent elements of the split
           ChoreographyPreprocessor.selectNextElements(target, nextElements, structuredChoreography);
         } else if (gateway.outgoing.length === 1) {
-          if (is('bpmn:ExclusiveGateway')(gateway)) {
+          if (is('bpmn:ExclusiveGateway')(gateway) || is('bpmn:EventBasedGateway')(gateway)) {
             // Case: Exclusive Join - Select the subsequent element of an exclusive gateway
             ChoreographyPreprocessor.selectNextElements(target, nextElements, structuredChoreography);
           } else if (is('bpmn:ParallelGateway')(gateway)) {
@@ -143,8 +142,8 @@ export class ChoreographyPreprocessor {
       flowNode.incoming.forEach((incomingEdge: SequenceFlow) => {
         const source = incomingEdge.sourceRef;
 
-        if (is('bpmn:ExclusiveGateway')(source)) {
-          if ((source as ExclusiveGateway).outgoing.length !== 1) {
+        if (is('bpmn:ExclusiveGateway')(source) || is('bpmn:EventBasedGateway')(source)) {
+          if ((source as Gateway).outgoing.length !== 1) {
             // Case: Exclusive Split - Select all subsequent elements of the gateway
             ChoreographyPreprocessor.selectNextElements(
               source,
@@ -153,8 +152,9 @@ export class ChoreographyPreprocessor {
             );
           } else {
             const edgeToExclusiveSplit = source.incoming
-              .find((incoming) => is('bpmn:ExclusiveGateway')(incoming.sourceRef) &&
-                ((incoming.sourceRef as ExclusiveGateway).outgoing.length !== 1));
+              .find((incoming) =>
+                (is('bpmn:ExclusiveGateway')(incoming.sourceRef) || is('bpmn:EventBasedGateway')(source)) &&
+                ((incoming.sourceRef as Gateway).outgoing.length !== 1));
             if (!isNullOrUndefined(edgeToExclusiveSplit)) {
               ChoreographyPreprocessor.selectNextElements(
                 edgeToExclusiveSplit.sourceRef,
