@@ -17,6 +17,8 @@ Tezos Blockchain Choreography Converter and Backend
 
 ## Routes
 
+The implemented routes can be found as Swagger Documentation in [Mantichor's Frontend Repository](https://github.com/bptlab/mantichor-frontend/blob/master/adapter-apidoc.yaml)
+
 ## Usage
 
 ### Running Locally
