@@ -1,7 +1,7 @@
 import { ChoreographyActivity, FlowNode, ParallelGateway, SequenceFlow } from 'bpmn-moddle';
 import fi from 'fi-compiler';
 import { isUndefined } from 'util';
-import { is } from '../helper/helpers';
+import { is } from '../helper';
 import { RoleMapping } from '../models/RoleMapping';
 import { ChoreographyElement } from './../models/ChoreographyElement';
 import { Contract } from './../models/Contract';

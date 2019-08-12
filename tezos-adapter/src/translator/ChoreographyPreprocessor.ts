@@ -11,7 +11,7 @@ import {
   SubChoreography,
 } from 'bpmn-moddle';
 import { isNullOrUndefined } from 'util';
-import { is, parseModdle } from '../helper/helpers';
+import { is, parseModdle } from '../helper';
 import { ChoreographyElement } from './../models/ChoreographyElement';
 import { StructuredChoreography } from './../models/StructuredChoreography';
 
