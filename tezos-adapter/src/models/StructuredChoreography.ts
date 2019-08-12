@@ -1,5 +1,5 @@
 import { FlowElement, ParallelGateway } from 'bpmn-moddle';
-import { is } from '../helper/helpers';
+import { is } from '../helper';
 import { ChoreographyElement } from './ChoreographyElement';
 
 export class StructuredChoreography {
