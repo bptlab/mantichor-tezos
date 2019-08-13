@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "npm run build && npm run serve",
-    "test": "jest",
+    "test": "jest --coverage",
     "build": "tsc",
     "serve": "node -r esm dist/index.js",
     "watch": "nodemon dist/index.js",
@@ -38,7 +38,7 @@
     "body-parser": "^1.19.0",
     "bpmn-moddle": "^5.1.6",
     "cors": "^2.8.5",
-    "esm": "^3.2.23",
+    "esm": "^3.2.25",
     "express": "^4.16.4",
     "fi-compiler": "^0.2.0",
     "request": "^2.88.0",
