@@ -4,3 +4,6 @@
 # Ignore tezos granary
 .granary/
 granary.json
+
+# Ignore jest coverage
+tezos-adapter/coverage

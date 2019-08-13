@@ -1,4 +1,6 @@
-import BpmnModdle, { Definitions } from 'bpmn-moddle';
+import { Definitions } from 'bpmn-moddle';
+// tslint:disable-next-line: no-var-requires
+const BpmnModdle = require('esm')(module)('bpmn-moddle').default;
 const moddle = new BpmnModdle();
 
 /**
