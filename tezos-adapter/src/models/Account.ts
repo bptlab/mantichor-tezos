@@ -30,7 +30,7 @@ export async function getAccountJsonFromFile(path: string): Promise<AccountJSON>
 }
 
 // Not going to work in  sandboxed mode!
-export async function readAccountFromFile(address: string): Promise<Account> {
+export async function readAndActivateAccountFromFile(address: string): Promise<Account> {
     const accountName = 'alphaAccount';
     const accountReadFromFile = await getAccountJsonFromFile(accountFilePath);
     const accountFromFile: Account = {
@@ -50,7 +50,7 @@ export async function getAccountForAddress(address: string): Promise<Account> {
     // if flag is set, try to read from file, else look in stored accounts
     // reading from file will  not work in sandboxed mode!
     return (process.env.USE_ACCOUNT_FILE === 'true')
-        ? await readAccountFromFile(address)
+        ? await readAndActivateAccountFromFile(address)
         : accounts.find((acc) => acc.address === address);
 }
 
