@@ -32,7 +32,7 @@ export class ChoreographyPreprocessor {
     });
 
     if (choreographies.length === 0) {
-      return;
+      return [];
     }
 
     const structuredChoreographies = choreographies.map((choreography: Choreography): StructuredChoreography => {
