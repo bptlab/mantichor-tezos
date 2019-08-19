@@ -1,8 +1,11 @@
+import * as fs from 'fs';
 import { ChoreographyElement } from './../../src/models/ChoreographyElement';
 import { StructuredChoreography } from './../../src/models/StructuredChoreography';
 import { ContractGenerator } from './../../src/translator/ContractGenerator';
 const BpmnModdle = require('esm')(module)('bpmn-moddle').default;
 const moddle = new BpmnModdle();
+
+const sequenceChoreo = fs.readFileSync('./test/test-choreographies/sequence.bpmn', 'utf8');
 
 test('Generate Storage for Task sequence', async () => {
   const init = new ChoreographyElement(moddle.create('bpmn:StartEvent', {id: 'Start1'}));
@@ -111,4 +114,34 @@ test('Add Sender Checks if Role is provided', async () => {
   ])];
   const code = ContractGenerator.generateFiCode(choreographies, [{roleId: 'Participant1', address: 'xxxxxx'}])[0].code;
   expect(code.match(/entry Task1 \(\) {.*assert \(SENDER == address "xxxxxx"\);/is).length).toEqual(1);
+});
+
+test('Generate Michelson Code', async () => {
+  const init = new ChoreographyElement(moddle.create('bpmn:StartEvent', {id: 'Start1'}));
+  const element1 = new ChoreographyElement(
+    moddle.create('bpmn:ChoreographyTask', {id: 'Task1', initiatingParticipantRef: {id: 'Participant1'}}));
+  const end = new ChoreographyElement(moddle.create('bpmn:EndEvent', {id: 'End1'}));
+  init.getNextElements().push(element1);
+  element1.getPreviousElements().push(element1);
+  element1.getNextElements().push(end);
+  end.getPreviousElements().push(end);
+  const choreographies = [new StructuredChoreography([
+    init,
+    element1,
+    end,
+  ])];
+  const code = ContractGenerator.generateFiCode(choreographies, [{roleId: 'Participant1', address: 'xxxxxx'}]);
+  const contract = ContractGenerator.compileFiCode(code)[0];
+  expect(contract.getCode).not.toBeNull();
+  expect(contract.getAbi).not.toBeNull();
+  expect(contract.getCode).not.toEqual('');
+  expect(contract.getAbi).not.toEqual('');
+});
+
+test('Generate Michelson from BPMN', async () => {
+  const contract = (await ContractGenerator.generateContractsFromBPMN(sequenceChoreo))[0];
+  expect(contract.getCode).not.toBeNull();
+  expect(contract.getAbi).not.toBeNull();
+  expect(contract.getCode).not.toEqual('');
+  expect(contract.getAbi).not.toEqual('');
 });
