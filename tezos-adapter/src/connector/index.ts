@@ -20,12 +20,9 @@ async function executeCommand(command: string): Promise<string> {
   return new Promise((resolve: (value: string) => void, reject: (reason: string | Error) => void) => {
     exec(executionCommand, (error, stdout, stderr) => {
       if (stdout) {
-        resolve(stdout);
+        return resolve(stdout);
       }
-      if (stderr) {
-        reject(stderr);
-      }
-      reject(error);
+      reject(stderr || error);
     });
   });
 }
@@ -50,13 +47,11 @@ export async function deployContract(contract: Contract, user: string): Promise<
         contractAddress = regexResult[1];
       }
     } catch (error) {
-      console.error('Error deploying contract');
-      console.error(error);
+      console.error('Error deploying contract', error);
     }
     fs.unlinkSync(path);
   } catch (error) {
-    console.error('Error creating/unlinking temporary contract file');
-    console.error(error);
+    console.error('Error creating/unlinking temporary contract file', error);
   }
   return contractAddress;
 }
