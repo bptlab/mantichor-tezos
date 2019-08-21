@@ -37,34 +37,20 @@ export async function deployContract(contract: Contract, user: string): Promise<
   const command = `originate contract ${contractName} ` +
     `for ${user} transferring 1 from ${user} running ${path} --init '${contract.getInitialState()}' --burn-cap 100`;
 
-  try {
-    fs.writeFileSync(path, contract.getCode());
-    try {
-      const result = await executeCommand(command);
-      console.info('Contract deployed');
-      const regexResult = result.match(/.*New contract (\w+) originated\..*/i);
-      if (regexResult.length > 1) {
-        contractAddress = regexResult[1];
-      }
-    } catch (error) {
-      console.error('Error deploying contract', error);
-    }
-    fs.unlinkSync(path);
-  } catch (error) {
-    console.error('Error creating/unlinking temporary contract file', error);
+  fs.writeFileSync(path, contract.getCode());
+  const result = await executeCommand(command);
+  console.info('Contract deployed');
+  const regexResult = result.match(/.*New contract (\w+) originated\..*/i);
+  if (regexResult && regexResult.length > 1) {
+    contractAddress = regexResult[1];
   }
+  fs.unlinkSync(path);
   return contractAddress;
 }
 
 export async function getContractStorage(address: string): Promise<string> {
   const command = `get script storage for ${address}`;
-  let storage = '';
-  try {
-    storage = await executeCommand(command);
-  } catch (error) {
-    console.error(error);
-  }
-  return storage;
+  return await executeCommand(command);
 }
 
 export async function callContractFunction(
@@ -73,7 +59,6 @@ export async function callContractFunction(
   const argument = fi.abi.entry(functionName);
   const command = `transfer 0 from ${user} to ${address} --arg '${argument}' --burn-cap 100`;
   const result = await executeCommand(command);
-  console.info(result);
   if (result.match(/.*This operation FAILED\..*/g)) {
     console.info(`Execution of function ${functionName} failed`);
     return false;
