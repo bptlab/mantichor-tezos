@@ -9,12 +9,13 @@ Make sure that the latest versions of [`docker`](https://docs.docker.com/install
 
 ## Starting
 
-Start the adapter using `docker run -p 7320:7320 --name mantichor-tezos-adapter -d bptlab/mantichor-tezos-adapter:latest` or `start.sh`.
+Start the adapter using `docker run -p 7320:7320 --name mantichor-tezos-adapter -d bptlab/mantichor-tezos-adapter:latest`.
+Alternatively, execute `start.sh` to build and run the local version of the adapter instead of the prebuilt one.
 You can follow the container output using `docker logs -f mantichor-tezos-adapter`
 
 ## Stopping
 
-Stop the tool using `docker stop mantichor-tezos-adapter && docker remove mantichor-tezos-adapter` or `stop.sh`.
+Stop the tool using `docker stop mantichor-tezos-adapter && docker rm mantichor-tezos-adapter` or `stop.sh`.
 
 After stopping, use `docker volume rm ...` to remove the volumes belonging to the adapter and to reset the state of the node.
 
