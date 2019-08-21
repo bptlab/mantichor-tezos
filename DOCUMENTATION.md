@@ -32,13 +32,14 @@ Similarly, call `docker-compose down` or `./stop.sh` to stop the adapter.
 
 Use `reset.sh` to reset the tezos chain and the data stored on the node.
 
-## Contract Generation
+## Smart Contract Generation
 
-Each choreography deployed on the Tezos Adapter must be converted into a Smart Contract that Tezos can understand. The Tezos Adapter generates .fi-files that are compiled to [Michelson code](https://tezos.gitlab.io/master/whitedoc/michelson.html) using the [fi compiler](https://github.com/TezTech/fi-compiler). The contract generation is based on the approach described by [Weber et al.](https://link.springer.com/chapter/10.1007/978-3-319-45348-4_19) for implementing choreographies on the blockchain.
+Each choreography deployed on the Tezos Adapter must be converted into a Smart Contract that Tezos can understand. The Tezos Adapter generates .fi-files that are compiled to [Michelson code](https://tezos.gitlab.io/master/whitedoc/michelson.html) using the [fi compiler](https://github.com/TezTech/fi-compiler). The contract generation is based on the approach described by [Weber et al.](https://link.springer.com/chapter/10.1007/978-3-319-45348-4_19) for implementing choreographies on the blockchain. The Smart Contract generation is divided into two sections. In the first section, the xml is converted into a structured choreography. A structured choreography consists of the choreography elements which are enriched with information about their predecessors and successors according to the rules of Weber et al.. In the second section the structured choreography is used to generate the fi code. The exact steps will be explained later in this chapter.
 
 ### Assumptions
 
 A correct translation of a choreography into a Smart Contract can only take place if the following conditions are met by the choreography:
+
 - Every gateway split merges with the corresponing gateway join. Alternatively, individual paths can also be terminated by an end event.
 - Tasks with a response message must be divided into two tasks.
 - A subchoreography must not contain a subchoreography.
@@ -51,7 +52,15 @@ The Smart Contract consists of two essential parts. The storage is defined in th
 
 ### Supported Choreography Elements
 
-The Tezos adapter supports the following choreography elements. The use of unsupported elements can lead to unexpected behavior.
+The Tezos adapter supports the following choreography elements. The use of unsupported elements can lead to unexpected behavior:
+
+- Start Event
+- End Event
+- Task
+- Event-based Gateway
+- Data-based Gateway
+- Parallel Gateway
+- Subchoreography
 
 #### Events
 
@@ -83,9 +92,16 @@ If a parallel split gateway is activated, all subsequent elements are activated.
 
 #### Subchoreographies
 
+Each subchoreography is represented by a flag. This flag determines whether the subchoreography is enabled or not. Tasks that are in a subchoreography can only be executed if the subchoreography is enabled. An end event deactivates the subchoreography. This allows multiple end events in a subchoreography. However, only one start event is allowed. Furthermore, nested subchoreographies are currently not supported. 
+
 ### Access Rights
+
+So that not every party can execute the choreography tasks, the tasks can be secured with access rights. A role mapping can be sent with the deployment of the choreography. The role mapping assigns Tezos user addresses to choreography participant ids. When the contract is generated, a verification is added to each task that checks whether the sender of the transaction corresponds to the tezos address corresponding to the participant who is the sender of the task. Several Tezos accounts can be active on one adapter. Therefore, when executing a task, you must specify with which account this should be done. However, access restrictions are optional or can be introduced in part. All tasks whose sender has not been assigned a tezos address remain unprotected.
 
 ### Limitations
 
+With the current approach to translating choreographies into smart contracts, there are some limitations that need to be considered:
+
+Messages sent via the execution of a choreography task cannot have any content. Therefore, this data cannot be persisted on the blockchain and cannot be used for e.g. data-based gateways.
 
 
