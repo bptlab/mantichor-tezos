@@ -1,21 +1,22 @@
 # Mantichor Tezos
 
 Tezos Blockchain Choreography Converter and Backend based on the Tezos Blockchain.
-The Adapter us listening for the Mantichor Frontend on Port 7320.
+The Adapter is listening for the Mantichor Frontend on Port 7320.
 
 ## Dependencies
 
-Make sure that the latest versions of [`docker`](https://docs.docker.com/install/) and [`docker-compose`](https://docs.docker.com/compose/install/) are installed.
+Make sure that the latest versions of [`docker`](https://docs.docker.com/install/) is installed.
 
 ## Starting
 
-Start the adapter using `docker-compose up --build` or `start.sh`.
+Start the adapter using `docker run -p 7320:7320 --name mantichor-tezos-adapter -d bptlab/mantichor-tezos-adapter:latest` or `start.sh`.
+You can follow the container output using `docker logs -f mantichor-tezos-adapter`
 
 ## Stopping
 
-Stop the tool using `docker-compose down` or `stop.sh`.
+Stop the tool using `docker stop mantichor-tezos-adapter && docker remove mantichor-tezos-adapter` or `stop.sh`.
 
-After stopping, execute `reset.sh` to reset the state of the tezos node.
+After stopping, use `docker volume rm ...` to remove the volumes belonging to the adapter and to reset the state of the node.
 
 The tezos node is a single sandbox node for now, not connected to either the tezos `alphanet` nor the `mainnet`.
 
