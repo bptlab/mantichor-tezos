@@ -31,3 +31,47 @@ So you can either call `docker-compose up --build` or `./start.sh` to start the 
 Similarly, call `docker-compose down` or `./stop.sh` to stop the adapter.
 
 Use `reset.sh` to reset the tezos chain and the data stored on the node.
+
+## Contract Generation
+
+Each choreography deployed on the Tezos Adapter must be converted into a Smart Contract that Tezos can understand. The Tezos Adapter generates .fi-files that are compiled to [Michelson code](https://tezos.gitlab.io/master/whitedoc/michelson.html) using the [fi compiler](https://github.com/TezTech/fi-compiler). The contract generation is based on the approach described by [Weber et al.](https://link.springer.com/chapter/10.1007/978-3-319-45348-4_19) for implementing choreographies on the blockchain.
+
+### Assumptions
+
+A correct translation of a choreography into a Smart Contract can only take place if the following conditions are met by the choreography:
+- Every gateway split merges with the corresponing gateway join. Alternatively, individual paths can also be terminated by an end event.
+- Tasks with a response message must be divided into two tasks.
+- A subchoreography must not contain a subchoreography.
+- Each choreography and each subchoreography has exactly one start event and at least one end event.
+- Only the choreography elements contained in the Supported choreography elements section are used.
+
+### Contract Struture
+
+The Smart Contract consists of two essential parts. The storage is defined in the first part. A Boolean flag is generated for each task, for each parallel join gateway and for each subchoreography. In addition, each Smart Contract also contains an initialized flag and a finished flag. The second part defines the functions. A function is generated for each Choreography Task. The structure of these functions is described in the next section. In addition, each Smart Contract has an init function. This initializes the subsequent elements of the start event.
+
+### Supported Choreography Elements
+
+#### Events
+
+##### Start Event
+
+##### End Event
+
+#### Tasks
+
+#### Gateways
+
+##### Event-based Gateway
+
+##### Data-based Gateway
+
+##### Parallel Gateway
+
+#### Subchoreographies
+
+### Access Rights
+
+### Limitations
+
+
+
