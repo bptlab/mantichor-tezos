@@ -7,10 +7,9 @@ The tezos adapter consists of the adapter itself, (a node.js server that runs in
 For a concise overview, take a look at [this](architecture.png) component diagram detailing the architecture.
 
 ## Tezos integration
-- built with docker-tezos-node image, used as base image for adapter
-- communication done via shell scripts provided by tezos, that wrap the RPC calls
-- Libraries don't work for interaction with tezos, as they are incompatible with the sandboxed node
-- use bootstrap accounts with a single node, but still use the proper alphanet protocol
+
+The tezos adatper uses a prebuilt tezos sandbox node as a base image. The sandboxed node utilises the alphanet protocol of the tezos blockchain, while being a single isolated node.
+Moreover, only a single node is used for each instance of the adapter, who therefore also can't communicate with each other. This however could be changed in the future. The adapter communicates with the tezos node by calling shell scripts provided by tezos that wrap the RPC calls. Since the sandboxed node is incompatible with libraries, this was the most reasonable approach. Below, we outline how a proper tezos alphanet could be used in the future, instead of a sanboxed one.
 
 ## How to change to a tezos alphanet node
 
