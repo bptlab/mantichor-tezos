@@ -2,7 +2,15 @@
 
 ## Architecture
 
-## Examples
+The tezos adapter consists of the adapter itself, (a node.js server that runs inside a docker container and exposes a REST API to the mantichor frontend, generates smart contracts for choreography diagrams, and communicates via an RPC interface with the tezos node), and the tezos node, which is pre-built and also part of the docker container, exposing said RPC interface.
+
+For a concise overview, take a look at [this](architecture.png) component diagram detailing the architecture.
+
+## Tezos integration
+- built with docker-tezos-node image, used as base image for adapter
+- communication done via shell scripts provided by tezos, that wrap the RPC calls
+- Libraries don't work for interaction with tezos, as they are incompatible with the sandboxed node
+- use bootstrap accounts with a single node, but still use the proper alphanet protocol
 
 ## How to change to a tezos alphanet node
 
@@ -16,21 +24,29 @@ Right now, the tezos node is a sandboxed alphanet node, built and run inside a c
 
 ## Building and publishing the tezos node
 
-The tezos node and the adapter are built using two different files (`tezos-docker-node.yaml` and `Dockerfile`), where the tezos node is published to the `bptlab` docker hub, as to keep build times low. Should changes be made to the adapter, you can rebuild the image by calling
+The tezos node and the adapter are built using two different files (`docker-tezos-node.yaml` and `docker-tezos-adapter.yaml`), where the tezos node is published to the `bptlab` docker hub, as to keep build times low, as well as the adapter image. Should changes be made, you can rebuild the images by executing
 
 ```shell
     docker build . -f docker-tezos-node.yaml -t bptlab/mantichor-tezos-node:latest
     docker push bptlab/mantichor-tezos-node:latest
 ```
 
+or
+
+```shell
+    docker build . -f docker-tezos-adapter.yaml -t bptlab/mantichor-tezos-adapter:latest
+    docker push bptlab/mantichor-tezos-adapter:latest
+```
+
 ## Running the tezos adapter
 
-The tezos adapter, consisting of the adapter itself and the tezos node, is run using docker-compose. The dockerfile used in the compose file adds the container to a docker image where the tezos node has already been built.
-So you can either call `docker-compose up --build` or `./start.sh` to start the tezos adapter.
+You can run the container using the pre-built image:
 
-Similarly, call `docker-compose down` or `./stop.sh` to stop the adapter.
+```shell
+    docker run --name mantichor-tezos-adapter -d bptlab/mantichor-tezos-adapter:latest
+```
 
-Use `reset.sh` to reset the tezos chain and the data stored on the node.
+or build and run the image manually, by executing `start.sh`. The container can be stopped using `stop.sh`, and the volumes used for storing blockchain data can be reset by using `docker volume ls` and removing these volumes.
 
 ## Smart Contract Generation
 
@@ -103,5 +119,3 @@ So that not every party can execute the choreography tasks, the tasks can be sec
 With the current approach to translating choreographies into smart contracts, there are some limitations that need to be considered:
 
 Messages sent via the execution of a choreography task cannot have any content. Therefore, this data cannot be persisted on the blockchain and cannot be used for e.g. data-based gateways.
-
-
