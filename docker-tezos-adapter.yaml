@@ -1,6 +1,9 @@
 FROM bptlab/mantichor-tezos-node:latest
 
-##### TEZOS ADAPTER #####
+VOLUME /var/run/tezos/node
+VOLUME /var/run/tezos/client
+
+EXPOSE 7320
 
 # Install Node.js
 RUN curl -sL https://deb.nodesource.com/setup_11.x | bash
