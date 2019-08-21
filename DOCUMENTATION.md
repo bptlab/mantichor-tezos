@@ -47,25 +47,39 @@ A correct translation of a choreography into a Smart Contract can only take plac
 
 ### Contract Struture
 
-The Smart Contract consists of two essential parts. The storage is defined in the first part. A Boolean flag is generated for each task, for each parallel join gateway and for each subchoreography. In addition, each Smart Contract also contains an initialized flag and a finished flag. The second part defines the functions. A function is generated for each Choreography Task. The structure of these functions is described in the next section. In addition, each Smart Contract has an init function. This initializes the subsequent elements of the start event.
+The Smart Contract consists of two essential parts. The storage is defined in the first part. A Boolean flag is generated for each task, for each parallel join gateway incoming sequence flow and for each subchoreography. In addition, each Smart Contract also contains an initialized flag and a finished flag. The second part defines the functions. A function is generated for each Choreography Task. The structure of these functions is described in the next section. In addition, each Smart Contract has an init function. This initializes the subsequent element of the start event.
 
 ### Supported Choreography Elements
+
+The Tezos adapter supports the following choreography elements. The use of unsupported elements can lead to unexpected behavior.
 
 #### Events
 
 ##### Start Event
 
+The start event is translated into the init function and the initialized flag that every Smart Contract has. However, it should be noted that exactly one start event should be used for a choreography. The init function activates the subsequent elements of the start event and sets the initialized flag to True. This prevents the start event from being executed more than once. Start events within subchoreographies are ignored. The succeeding element of the start event is activated as soon as the subchoreography is activated.
+
 ##### End Event
 
+The end event is represented by the finished flag. However, there is only one finished flag for all end events. As soon as an end event is reached, the finished flag is set to True.  Exceptions are the end events within a subchoreography. If an end event is reached in a subchoreography, the subchoreography is deactivated and the subsequent element of the subchoreography is activated.
+
 #### Tasks
+
+A task is represented by a function. This function can only be executed if the task is activated. If the task is executed successfully, it will be deactivated and its successor will be activated. A task with a response message must be split into two tasks according to the assumptions. Currently no payload is supported when executing a task.
 
 #### Gateways
 
 ##### Event-based Gateway
 
+If an event-based split gateway is activated, all following elements of the gateway are activated instead. In addition, any task that follows an event-based gateway disables all subsequent elements of the gateway when executed. This ensures that only one path can be executed. However, so far only message tasks are supported as deciding events. An event-based join gateway only activates its successor when it is activated. The gateway is therefore not explicitly defined in the Smart Contract, but implicitly according to the task behaviour.
+
 ##### Data-based Gateway
 
+Since message payload is currently not supported, data-based gateways behave in the same way as event-based gateways.
+
 ##### Parallel Gateway
+
+If a parallel split gateway is activated, all subsequent elements are activated. For a parallel join gateway, a boolean flag is generated for each incoming sequence flow. If a task that is a predecessor of the parallel join gateway has been executed, it activates the corresponding sequence flow flag and checks all incoming sequence flow flags that belong to the gateway. If all evaluate to True, the following element of the gateway is activated. Parallel gateways are thus implemented both via the sequence flow flags and via the task behavior.
 
 #### Subchoreographies
 
