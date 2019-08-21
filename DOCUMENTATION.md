@@ -8,8 +8,8 @@ For a concise overview, take a look at [this](architecture.png) component diagra
 
 ## Tezos integration
 
-The tezos adatper uses a prebuilt tezos sandbox node as a base image. The sandboxed node utilises the alphanet protocol of the tezos blockchain, while being a single isolated node.
-Moreover, only a single node is used for each instance of the adapter, who therefore also can't communicate with each other. This however could be changed in the future. The adapter communicates with the tezos node by calling shell scripts provided by tezos that wrap the RPC calls. Since the sandboxed node is incompatible with libraries, this was the most reasonable approach. Below, we outline how a proper tezos alphanet could be used in the future, instead of a sanboxed one.
+The tezos adapter uses a prebuilt tezos sandbox node as a base image. The sandboxed node utilises the alphanet protocol of the tezos blockchain, while being a single isolated node.
+Moreover, only a single node is used for each instance of the adapter, who therefore also can't communicate with each other. This however could be changed in the future. The adapter communicates with the tezos node by calling shell scripts provided by tezos that wrap the RPC calls. Since the sandboxed node is incompatible with libraries, this was the most reasonable approach. Below, we outline how a proper tezos alphanet could be used in the future, instead of a sandboxed one.
 
 ## How to change to a tezos alphanet node
 
@@ -55,19 +55,19 @@ Each choreography deployed on the Tezos Adapter must be converted into a Smart C
 
 A correct translation of a choreography into a Smart Contract can only take place if the following conditions are met by the choreography:
 
-- Every gateway split merges with the corresponing gateway join. Alternatively, individual paths can also be terminated by an end event.
+- Every gateway split merges with the corresponding gateway join. Alternatively, individual paths can also be terminated by an end event.
 - Tasks with a response message must be divided into two tasks.
 - A subchoreography must not contain a subchoreography.
 - Each choreography and each subchoreography has exactly one start event and at least one end event.
 - Only the choreography elements contained in the Supported choreography elements section are used.
 
-### Contract Struture
+### Contract Structure
 
 The Smart Contract consists of two essential parts. The storage is defined in the first part. A Boolean flag is generated for each task, for each parallel join gateway incoming sequence flow and for each subchoreography. In addition, each Smart Contract also contains an initialized flag and a finished flag. The second part defines the functions. A function is generated for each Choreography Task. The structure of these functions is described in the next section. In addition, each Smart Contract has an init function. This initializes the subsequent element of the start event.
 
 ### Supported Choreography Elements
 
-The Tezos adapter supports the following choreography elements. The use of unsupported elements can lead to unexpected behavior:
+The Tezos adapter supports the following choreography elements. The use of unsupported elements can lead to unexpected behaviour:
 
 - Start Event
 - End Event
@@ -103,11 +103,11 @@ Since message payload is currently not supported, data-based gateways behave in 
 
 ##### Parallel Gateway
 
-If a parallel split gateway is activated, all subsequent elements are activated. For a parallel join gateway, a boolean flag is generated for each incoming sequence flow. If a task that is a predecessor of the parallel join gateway has been executed, it activates the corresponding sequence flow flag and checks all incoming sequence flow flags that belong to the gateway. If all evaluate to True, the following element of the gateway is activated. Parallel gateways are thus implemented both via the sequence flow flags and via the task behavior.
+If a parallel split gateway is activated, all subsequent elements are activated. For a parallel join gateway, a boolean flag is generated for each incoming sequence flow. If a task that is a predecessor of the parallel join gateway has been executed, it activates the corresponding sequence flow flag and checks all incoming sequence flow flags that belong to the gateway. If all evaluate to True, the following element of the gateway is activated. Parallel gateways are thus implemented both via the sequence flow flags and via the task behaviour.
 
 #### Subchoreographies
 
-Each subchoreography is represented by a flag. This flag determines whether the subchoreography is enabled or not. Tasks that are in a subchoreography can only be executed if the subchoreography is enabled. An end event deactivates the subchoreography. This allows multiple end events in a subchoreography. However, only one start event is allowed. Furthermore, nested subchoreographies are currently not supported. 
+Each subchoreography is represented by a flag. This flag determines whether the subchoreography is enabled or not. Tasks that are in a subchoreography can only be executed if the subchoreography is enabled. An end event deactivates the subchoreography. This allows multiple end events in a subchoreography. However, only one start event is allowed. Furthermore, nested subchoreographies are currently not supported.
 
 ### Access Rights
 
