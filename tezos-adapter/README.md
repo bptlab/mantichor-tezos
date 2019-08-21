@@ -27,7 +27,7 @@ Make sure you have [Node.js](https://nodejs.org/en/download/) installed.
 
 #### Installation
 
-```
+```bash
 npm install
 ```
 
@@ -41,7 +41,7 @@ npm install
 
 ### Using Docker
 
-```
+```bash
 docker build -t tezos-adapter .
 docker run --rm -p 3000:3000 -e TEZOS_VERSION="alpha" -e TEZOS_KEY="someSecretKey" --name tezos-adapter -it tezos-adapter
 ```
