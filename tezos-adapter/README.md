@@ -38,6 +38,7 @@ npm install
 - `npm run serve` - serves the previously built project
 - `npm run watch` - build the projects, serves it and automatically updates on local changes
 - `npm run lint` - runs the linter
+- `npm run test` - runs the test suites
 
 ### Using Docker
 
