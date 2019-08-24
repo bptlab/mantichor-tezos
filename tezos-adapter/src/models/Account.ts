@@ -21,20 +21,26 @@ interface AccountJSON {
 
 }
 
-// Not going to work in  sandboxed mode
-async function readAccountFromFile(address: string): Promise<Account> {
-    const accountName = 'alphaAccount';
-    const accountFilePath = resolve(__dirname, './alphanetAccount');
-    const accountFile = readFileSync(accountFilePath, 'utf-8');
+export const accountFilePath = resolve(__dirname, './alphanetAccount.json');
+
+export async function getAccountJsonFromFile(path: string): Promise<AccountJSON> {
+    const accountFile = readFileSync(path, 'utf-8');
     const accountJson: AccountJSON = JSON.parse(accountFile);
+    return accountJson;
+}
+
+// Not going to work in  sandboxed mode!
+export async function readAndActivateAccountFromFile(address: string): Promise<Account> {
+    const accountName = 'alphaAccount';
+    const accountReadFromFile = await getAccountJsonFromFile(accountFilePath);
     const accountFromFile: Account = {
-        address: accountJson.pkh,
+        address: accountReadFromFile.pkh,
         identifier: accountName,
         publicKey: '',
-        secretKey: accountJson.secret,
+        secretKey: accountReadFromFile.secret,
     };
 
-    if (accountJson.pkh !== address) { return undefined; }
+    if (accountReadFromFile.pkh !== address) { return undefined; }
     const isActivated = await activateAlphanetAccount(accountFilePath, accountName);
     const activatedAccount = isActivated ? accountFromFile : undefined;
     return activatedAccount;
@@ -44,7 +50,7 @@ export async function getAccountForAddress(address: string): Promise<Account> {
     // if flag is set, try to read from file, else look in stored accounts
     // reading from file will  not work in sandboxed mode!
     return (process.env.USE_ACCOUNT_FILE === 'true')
-        ? await readAccountFromFile(address)
+        ? await readAndActivateAccountFromFile(address)
         : accounts.find((acc) => acc.address === address);
 }
 

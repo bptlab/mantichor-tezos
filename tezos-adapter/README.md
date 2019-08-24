@@ -38,6 +38,13 @@ npm install
 - `npm run serve` - serves the previously built project
 - `npm run watch` - build the projects, serves it and automatically updates on local changes
 - `npm run lint` - runs the linter
+- `npm run test` - runs the test suites
+
+#### Testing
+
+Tests can be run with: `npm run test`. This results in a testing result and coverage report printed to the CLI.
+
+The test suite is [Jest](https://jestjs.io/). As much adapter internal functionalities as should be tested. A mock Blockchain is not implemented yet.
 
 ### Using Docker
 

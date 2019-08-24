@@ -1,9 +1,9 @@
 import bodyParser from 'body-parser';
+import cors from 'cors';
 import express from 'express';
 import * as request from 'request-promise-native';
 import sleep from 'sleepjs';
 import choreographyRouter from './routers/choreography';
-import cors from 'cors';
 
 const main = async () => {
   await sleep(20000);
