@@ -9,8 +9,8 @@ Make sure that the latest versions of [`docker`](https://docs.docker.com/install
 
 ## Starting
 
-Start a pre-built version of the adapter using `docker run -p 7320:7320 --name mantichor-tezos-adapter -d bptlab/mantichor-tezos-adapter:latest`.
-Alternatively, execute `start.sh` (or the commands described [here](DOCUMENTATION.md)) to build and run the local version of the adapter instead of the prebuilt one.
+Start a **pre-built version** of the adapter using `docker run -p 7320:7320 --name mantichor-tezos-adapter -d bptlab/mantichor-tezos-adapter:latest`.
+Alternatively, execute `start.sh` (or the commands described [here](DOCUMENTATION.md#running-the-tezos-adapter)) to **build** and run the local version of the adapter instead of the prebuilt one.
 You can follow the container output using `docker logs -f mantichor-tezos-adapter`
 
 ## Stopping

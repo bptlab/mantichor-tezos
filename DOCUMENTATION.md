@@ -41,13 +41,21 @@ to update the tezos adapter.
 
 ## Running the tezos adapter
 
-You can run the container using the pre-built image:
+You can run the container using the **pre-built** image:
 
 ```shell
     docker run --name mantichor-tezos-adapter -d bptlab/mantichor-tezos-adapter:latest
 ```
 
-or build and run the image manually, by executing `start.sh`. The container can be stopped using `stop.sh`, and the volumes used for storing blockchain data can be reset by using `docker volume ls` and removing these volumes.
+or build and run the image **manually**, by executing `start.sh` or
+
+```shell
+    docker build -f docker-tezos-adapter.yaml . -t mantichor-tezos-adapter
+    docker run -p 7320:7320 --name mantichor-tezos-adapter -d mantichor-tezos-adapter
+    docker logs -f mantichor-tezos-adapter
+```
+
+The container can be stopped using `stop.sh`, and the volumes used for storing blockchain data can be reset by using `docker volume ls` and removing these volumes.
 
 ## Smart Contract Generation
 
