@@ -4,7 +4,7 @@
 
 The tezos adapter consists of the adapter itself, (a node.js server that runs inside a docker container and exposes a REST API to the mantichor frontend, generates smart contracts for choreography diagrams, and communicates via an RPC interface with the tezos node), and the tezos node, which is pre-built and also part of the docker container, exposing said RPC interface.
 
-The REST API implemented in this adapter has been defined for the whole mantichor framework. Further information about the API and a corresponding swagger file can be found [here](https://github.com/bptlab/mantichor-frontend)
+The REST API implemented in this adapter has been defined for the whole mantichor framework. Further information about the API and a corresponding swagger file can be found [here](https://github.com/bptlab/mantichor-frontend).
 
 For a concise overview, take a look at [this](architecture.png) component diagram detailing the architecture.
 
