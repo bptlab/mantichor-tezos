@@ -45,10 +45,3 @@ npm install
 Tests can be run with: `npm run test`. This results in a testing result and coverage report printed to the CLI.
 
 The test suite is [Jest](https://jestjs.io/). As much adapter internal functionalities as should be tested. A mock Blockchain is not implemented yet.
-
-### Using Docker
-
-```bash
-docker build -t tezos-adapter .
-docker run --rm -p 3000:3000 -e TEZOS_VERSION="alpha" -e TEZOS_KEY="someSecretKey" --name tezos-adapter -it tezos-adapter
-```

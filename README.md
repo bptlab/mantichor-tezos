@@ -22,4 +22,5 @@ After stopping, use `docker volume rm ...` to remove the volumes belonging to th
 The tezos node is a single sandbox node for now, not connected to either the tezos `alphanet` nor the `mainnet`.
 
 ---
-For more in-depth information, e.g. on how to change the adapter to use a full alphanet, see [this](DOCUMENTATION.md) Documentation.
+For more in-depth information, e.g. on how to change the adapter to use a full alphanet, see this [Documentation](DOCUMENTATION.md).
+The adapter's implementation details can be found in the adapter's [Readme](tezos-adapter/README.md).
